@@ -89,7 +89,14 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
               flex: 1,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
-                child: Text("Icon " + (i + 1).toString()),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Icon " + (i + 1).toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
+                    SizedBox(height: 15,),
+                    Text("type: Image"),
+                  ],
+                ),
               ),
             ),
             Icon(Icons.chevron_right, color: Colors.black38, size: 25.0,)
