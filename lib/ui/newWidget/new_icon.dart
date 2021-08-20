@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 
 class NewIconScreen extends StatefulWidget {
   @override
@@ -6,6 +10,22 @@ class NewIconScreen extends StatefulWidget {
 }
 
 class _NewIconScreenState extends State<NewIconScreen> {
+  String _name = "";
+  String? _image;
+  var _controller = TextEditingController(text: 'New Icon Name');
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _chooseImage() async {
+    var image = await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = image!.path;
+    });
+  }
+
+  void _onComleteClicked() {
+
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -23,8 +43,20 @@ class _NewIconScreenState extends State<NewIconScreen> {
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: GestureDetector(
+              onTap: () {
+                _onComleteClicked();
+              },
+              child: Icon(Icons.check, size: 26,),
+            ),
+          ),
+        ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+          child: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
           // Column is also a layout widget. It takes a list of children and
@@ -43,25 +75,36 @@ class _NewIconScreenState extends State<NewIconScreen> {
           // horizontal).
           children: <Widget>[
             TextField(
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: 'Enter a icon name'),
+              controller: _controller,
+              decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Enter a icon name'),
+              onChanged: (value) {
+                setState(() {
+                  _name = value;
+                });
+              },
             ),
-            new LayoutBuilder(builder: (context, constraint) {
-              return Icon(
-                Icons.image,
-                size: constraint.biggest.width,
-              );
-            }),
+            Padding(
+              padding: const EdgeInsets.only(top: 15, bottom: 15),
+              child: new LayoutBuilder(builder: (context, constraint) {
+                return _image == null
+                    ? SvgPicture.asset(
+                        "assets/images/ic_placeholder.svg",
+                        width: constraint.biggest.width,
+                      )
+                    : Image.file(File(_image!),
+                        width: constraint.biggest.width,);
+              }),
+            ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                   textStyle: const TextStyle(fontSize: 16),
                   minimumSize: Size(double.infinity, 44)),
-              onPressed: () => {},
+              onPressed: () => {_chooseImage()},
               child: Text('Choose image'),
             )
           ],
         ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      )), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
