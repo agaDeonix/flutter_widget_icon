@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewIconScreen extends StatefulWidget {
   @override
@@ -12,7 +14,7 @@ class NewIconScreen extends StatefulWidget {
 class _NewIconScreenState extends State<NewIconScreen> {
   String _name = "";
   String? _image;
-  var _controller = TextEditingController(text: 'New Icon Name');
+  var _controller = TextEditingController(text: '');
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _chooseImage() async {
@@ -23,7 +25,35 @@ class _NewIconScreenState extends State<NewIconScreen> {
   }
 
   void _onComleteClicked() {
-
+    FocusScope.of(context).unfocus();
+    if (_name.isEmpty) {
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Container(child: Text('Enter name'), alignment: AlignmentDirectional.center, height: 30,)));
+      return;
+    }
+    if (_image == null || _image!.isEmpty) {
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Container(child: Text('Choose image'), alignment: AlignmentDirectional.center, height: 30,)));
+      return;
+    }
+    () async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var list = prefs.getStringList("ids") ?? [];
+      var last;
+      if (list.isEmpty) {
+        last = "0";
+      } else {
+        last = list.last;
+      }
+      var id = (int.parse(last) + 1).toString();
+      list.add(id);
+      prefs.setStringList("ids", list);
+      prefs.setString("name_$id", _name);
+      prefs.setString("path_$id", _image!);
+      Navigator.pop(context, true);
+    }();
   }
 
   @override
@@ -50,7 +80,10 @@ class _NewIconScreenState extends State<NewIconScreen> {
               onTap: () {
                 _onComleteClicked();
               },
-              child: Icon(Icons.check, size: 26,),
+              child: Icon(
+                Icons.check,
+                size: 26,
+              ),
             ),
           ),
         ],
@@ -76,7 +109,8 @@ class _NewIconScreenState extends State<NewIconScreen> {
           children: <Widget>[
             TextField(
               controller: _controller,
-              decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Enter a icon name'),
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(), hintText: 'Enter a icon name'),
               onChanged: (value) {
                 setState(() {
                   _name = value;
@@ -85,23 +119,25 @@ class _NewIconScreenState extends State<NewIconScreen> {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 15, bottom: 15),
-              child: new LayoutBuilder(builder: (context, constraint) {
-                return _image == null
-                    ? SvgPicture.asset(
-                        "assets/images/ic_placeholder.svg",
-                        width: constraint.biggest.width,
-                      )
-                    : Image.file(File(_image!),
-                        width: constraint.biggest.width,);
-              }),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    textStyle: const TextStyle(fontSize: 16),
+                    minimumSize: Size(double.infinity, 44)),
+                onPressed: () => {_chooseImage()},
+                child: Text('Choose image'),
+              ),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  textStyle: const TextStyle(fontSize: 16),
-                  minimumSize: Size(double.infinity, 44)),
-              onPressed: () => {_chooseImage()},
-              child: Text('Choose image'),
-            )
+            new LayoutBuilder(builder: (context, constraint) {
+              return _image == null
+                  ? SvgPicture.asset(
+                "assets/images/ic_placeholder.svg",
+                width: constraint.biggest.width,
+              )
+                  : Image.file(
+                File(_image!),
+                width: constraint.biggest.width,
+              );
+            })
           ],
         ),
       )), // This trailing comma makes auto-formatting nicer for build methods.

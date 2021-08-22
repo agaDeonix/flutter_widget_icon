@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:widget_icon/ui/editWidget/edit_icon.dart';
 import 'package:widget_icon/ui/newWidget/new_icon.dart';
 import 'package:widget_icon/ui/widgets_list/widgets_list.dart';
 
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => WidgetsListScreen(),
         // When navigating to the "/second" route, build the SecondScreen widget.
         '/add_new': (context) => NewIconScreen(),
+        '/edit': (context) => EditIconScreen(),
       },
       theme: ThemeData(
         // This is the theme of your application.

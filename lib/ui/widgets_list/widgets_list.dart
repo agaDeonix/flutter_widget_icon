@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WidgetsListScreen extends StatefulWidget {
   @override
@@ -7,14 +9,42 @@ class WidgetsListScreen extends StatefulWidget {
 }
 
 class _WidgetsListScreenState extends State<WidgetsListScreen> {
-  int _counter = 10;
+  List<String> _ids = [];
+  Map<String, String> _widgets = {};
+  SharedPreferences? _prefs;
 
-  void _incrementCounter() {
-    Navigator.pushNamed(context, '/add_new');
+  @override
+  void initState() {
+    super.initState();
+    () async {
+      _prefs = await SharedPreferences.getInstance();
+      setState(() {});
+    }();
+  }
+
+  void _addNew() {
+    Navigator.pushNamed(context, '/add_new').then((value) {
+      setState(() {});
+    });
+  }
+
+  void _editItem(String id) {
+    Navigator.pushNamed(context, '/edit', arguments: id).then((value) {
+      setState(() {});
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+
+    if(_prefs != null) {
+      _ids = _prefs!.getStringList("ids") ?? List.empty();
+      for (var id in _ids) {
+        _widgets["name_$id"] = _prefs!.getString("name_$id") ?? "";
+        _widgets["path_$id"] = _prefs!.getString("path_$id") ?? "";
+      }
+    }
+
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -30,13 +60,44 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: _counter == 0 ? _initEmpty() : _initList(),
+        child: _prefs == null ? _initLoading() : (_ids.isEmpty ? _initEmpty() : _initList()),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _addNew,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  Widget _initLoading() {
+    return Column(
+      // Column is also a layout widget. It takes a list of children and
+      // arranges them vertically. By default, it sizes itself to fit its
+      // children horizontally, and tries to be as tall as its parent.
+      //
+      // Invoke "debug painting" (press "p" in the console, choose the
+      // "Toggle Debug Paint" action from the Flutter Inspector in Android
+      // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+      // to see the wireframe for each widget.
+      //
+      // Column has various properties to control how it sizes itself and
+      // how it positions its children. Here we use mainAxisAlignment to
+      // center the children vertically; the main axis here is the vertical
+      // axis because Columns are vertical (the cross axis would be
+      // horizontal).
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        SizedBox(
+          width: 50,
+          height: 50,
+          child: CircularProgressIndicator(
+            strokeWidth: 5,
+            backgroundColor: Colors.white,
+            valueColor: new AlwaysStoppedAnimation<Color>(Colors.blue),
+          ),
+        ),
+      ],
     );
   }
 
@@ -67,40 +128,56 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
   }
 
   Widget _initList() {
-    final items = List<Widget>.generate(_counter, (i) => _initItem(i));
+    final items = _ids.map((e) => _initItem(e)).toList();
     return ListView(
       children: items,
     );
   }
 
-  Widget _initItem(int i) {
-    return Card(
-      margin: EdgeInsets.all(10),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Image.network(
-                'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl-2.jpg',
+  Widget _initItem(String id) {
+    var name = _widgets["name_$id"]!;
+    var path = _widgets["path_$id"]!;
+    return GestureDetector(
+      onTap: () => _editItem(id),
+      child: Card(
+        margin: EdgeInsets.all(10),
+        elevation: 4,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Image.file(
+                File(path),
                 width: 50,
-                height: 50),
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Icon " + (i + 1).toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
-                    SizedBox(height: 15,),
-                    Text("type: Image"),
-                  ],
+                height: 50,
+              ),
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style:
+                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Text("type: Image"),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Icon(Icons.chevron_right, color: Colors.black38, size: 25.0,)
-          ],
+              Icon(
+                Icons.chevron_right,
+                color: Colors.black38,
+                size: 25.0,
+              )
+            ],
+          ),
         ),
       ),
     );
