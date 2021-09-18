@@ -1,11 +1,38 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:receive_intent/receive_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WidgetsListScreen extends StatefulWidget {
   @override
   _WidgetsListScreenState createState() => _WidgetsListScreenState();
+}
+
+class LifecycleEventHandler extends WidgetsBindingObserver {
+  final AsyncCallback resumeCallBack;
+  final AsyncCallback suspendingCallBack;
+
+  LifecycleEventHandler({
+    required this.resumeCallBack,
+    required this.suspendingCallBack,
+  });
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        await resumeCallBack();
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        await suspendingCallBack();
+        break;
+    }
+  }
 }
 
 class _WidgetsListScreenState extends State<WidgetsListScreen> {
@@ -16,10 +43,22 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
   @override
   void initState() {
     super.initState();
-    () async {
+        () async {
       _prefs = await SharedPreferences.getInstance();
       setState(() {});
     }();
+    SystemChannels.lifecycle.setMessageHandler((msg) async {
+      debugPrint('SystemChannels> $msg');
+      if (msg == AppLifecycleState.resumed.toString()) {
+        _prefs = await SharedPreferences.getInstance();
+        setState(() {});
+        // () async {
+        //   _prefs = await SharedPreferences.getInstance();
+        //   setState(() {});
+        // }();
+      }
+      ;
+    });
   }
 
   void _addNew() {
@@ -36,9 +75,13 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-    if(_prefs != null) {
-      _ids = _prefs!.getStringList("ids") ?? List.empty();
+    if (_prefs != null) {
+      _ids = _prefs!
+          .getString("list_ids")
+          ?.split(",")
+          .where((element) => element.isNotEmpty)
+          .toList() ??
+          List.empty();
       for (var id in _ids) {
         _widgets["name_$id"] = _prefs!.getString("name_$id") ?? "";
         _widgets["path_$id"] = _prefs!.getString("path_$id") ?? "";
@@ -60,13 +103,15 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: _prefs == null ? _initLoading() : (_ids.isEmpty ? _initEmpty() : _initList()),
+        child: _prefs == null
+            ? _initLoading()
+            : (_ids.isEmpty ? _initEmpty() : _initList()),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addNew,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _addNew,
+      //   tooltip: 'Increment',
+      //   child: Icon(Icons.add),
+      // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
@@ -128,29 +173,28 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
   }
 
   Widget _initList() {
-    final items = _ids.map((e) => _initItem(e)).toList();
-    return ListView(
-      children: items,
+    return ListView.builder(
+      itemCount: _ids.length,
+      itemBuilder: (context, index) {
+        return _initItem(_ids[index], index == 0, index == _ids.length - 1);
+      },
     );
   }
 
-  Widget _initItem(String id) {
+  Widget _initItem(String id, bool isFirst, bool isLast) {
     var name = _widgets["name_$id"]!;
     var path = _widgets["path_$id"]!;
     return GestureDetector(
       onTap: () => _editItem(id),
       child: Card(
-        margin: EdgeInsets.all(10),
+        margin: EdgeInsets.fromLTRB(10, isFirst ? 10 : 5, 10, isLast ? 10 : 5),
         elevation: 4,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
             children: [
-              Image.file(
-                File(path),
-                width: 50,
-                height: 50,
-              ),
+              Image.file(File(path),
+                  width: 50, height: 50, fit: BoxFit.cover),
               Expanded(
                 flex: 1,
                 child: Padding(
@@ -160,8 +204,8 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
                     children: [
                       Text(
                         name,
-                        style:
-                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(
                         height: 15,

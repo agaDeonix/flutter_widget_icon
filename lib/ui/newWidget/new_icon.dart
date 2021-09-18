@@ -1,17 +1,28 @@
 import 'dart:io';
 
+import 'package:android_intent/android_intent.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:receive_intent/receive_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer' as developer;
 
 class NewIconScreen extends StatefulWidget {
+
+  String widgetId;
+
+  NewIconScreen(this.widgetId);
+
   @override
   _NewIconScreenState createState() => _NewIconScreenState();
 }
 
 class _NewIconScreenState extends State<NewIconScreen> {
+  // String _id = "";
   String _name = "";
   String? _image;
   var _controller = TextEditingController(text: '');
@@ -40,24 +51,43 @@ class _NewIconScreenState extends State<NewIconScreen> {
     }
     () async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      var list = prefs.getStringList("ids") ?? [];
-      var last;
-      if (list.isEmpty) {
-        last = "0";
+      var list = prefs.getString("list_ids");
+      if (list == null || list.isEmpty) {
+        list = widget.widgetId;
       } else {
-        last = list.last;
+        list += ",${widget.widgetId}";
       }
-      var id = (int.parse(last) + 1).toString();
-      list.add(id);
-      prefs.setStringList("ids", list);
-      prefs.setString("name_$id", _name);
-      prefs.setString("path_$id", _image!);
-      Navigator.pop(context, true);
+      prefs.setString("list_ids", list);
+      prefs.setString("name_${widget.widgetId}", _name).then((value) => prefs.setString("path_${widget.widgetId}", _image!).then((value) => _setActivityResult()));
     }();
+  }
+
+  Future<void> _setActivityResult() async {
+    developer.log('created_${widget.widgetId}', name: 'WIDGET');
+    // android_intent.Intent()
+    //   ..setAction("android.appwidget.action.APPWIDGET_UPDATE")
+    //   ..putExtra("appWidgetId", _id)
+    //   ..startActivity().catchError((e) => print(e));
+    // if (Platform.isAndroid) {
+    //   AndroidIntent intent = AndroidIntent(
+    //     action: 'android.appwidget.action.APPWIDGET_UPDATE',
+    //     data: 'package:com.pinkunicorp.widget_icon',
+    //     arguments: {'appWidgetId': _id},
+    //   );
+    //   await intent.launch();
+    // }
+    HomeWidget.updateWidget(
+      name: 'SimpleAppWidget',
+      androidName: 'SimpleAppWidget',
+      iOSName: 'SimpleAppWidget',
+    );
+    await ReceiveIntent.setResult(kActivityResultOk).then((value) => SystemNavigator.pop());
   }
 
   @override
   Widget build(BuildContext context) {
+    ReceiveIntent.setResult(kActivityResultCanceled);
+    // _id = ModalRoute.of(context)!.settings.arguments as String;
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -62,6 +63,11 @@ class _EditIconScreenState extends State<EditIconScreen> {
     () async {
       _prefs?.setString("name_$_id", _name);
       _prefs?.setString("path_$_id", _image!);
+      HomeWidget.updateWidget(
+        name: 'SimpleAppWidget',
+        androidName: 'SimpleAppWidget',
+        iOSName: 'SimpleAppWidget',
+      );
       Navigator.pop(context, true);
     }();
   }
@@ -91,9 +97,9 @@ class _EditIconScreenState extends State<EditIconScreen> {
 
   void _remove() {
     () async {
-      var list = _prefs!.getStringList("ids") ?? [];
+      var list = _prefs!.getString("list_ids")?.split(",") ?? [];
       list.remove(_id);
-      _prefs!.setStringList("ids", list);
+      _prefs!.setString("list_ids", list.join(","));
       _prefs!.remove("name_$_id");
       _prefs!.remove("path_$_id");
       Navigator.pop(context, true);
