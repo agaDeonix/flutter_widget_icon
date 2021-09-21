@@ -76,6 +76,7 @@ class _MyAppState extends State<MyApp> {
           routes: {
             // When navigating to the "/" route, build the FirstScreen widget.
             '/': (context) => WidgetsListScreen(),
+            '/add_new': (context) => NewIconScreen(null),
             '/edit': (context) => EditIconScreen(),
           },
           theme: ThemeData(

@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:receive_intent/receive_intent.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WidgetsListScreen extends StatefulWidget {
@@ -49,16 +49,18 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
     }();
     SystemChannels.lifecycle.setMessageHandler((msg) async {
       debugPrint('SystemChannels> $msg');
-      if (msg == AppLifecycleState.resumed.toString()) {
-        _prefs = await SharedPreferences.getInstance();
-        setState(() {});
-        // () async {
-        //   _prefs = await SharedPreferences.getInstance();
-        //   setState(() {});
-        // }();
+      if (msg == AppLifecycleState.resumed.toString() && _prefs != null) {
+        _prefs!.reload().then((value) {
+          setState(() {});
+        });
       }
       ;
     });
+    HomeWidget.updateWidget(
+      name: 'SimpleAppWidget',
+      androidName: 'SimpleAppWidget',
+      iOSName: 'SimpleAppWidget',
+    );
   }
 
   void _addNew() {
@@ -107,11 +109,11 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
             ? _initLoading()
             : (_ids.isEmpty ? _initEmpty() : _initList()),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _addNew,
-      //   tooltip: 'Increment',
-      //   child: Icon(Icons.add),
-      // ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addNew,
+        tooltip: 'Increment',
+        child: Icon(Icons.add),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 

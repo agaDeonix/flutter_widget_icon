@@ -13,7 +13,7 @@ import 'dart:developer' as developer;
 
 class NewIconScreen extends StatefulWidget {
 
-  String widgetId;
+  String? widgetId;
 
   NewIconScreen(this.widgetId);
 
@@ -22,11 +22,13 @@ class NewIconScreen extends StatefulWidget {
 }
 
 class _NewIconScreenState extends State<NewIconScreen> {
-  // String _id = "";
+
+  bool _isConfig = false;
   String _name = "";
   String? _image;
   var _controller = TextEditingController(text: '');
   final ImagePicker _picker = ImagePicker();
+
 
   Future<void> _chooseImage() async {
     var image = await _picker.pickImage(source: ImageSource.gallery);
@@ -57,7 +59,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
       } else {
         list += ",${widget.widgetId}";
       }
-      prefs.setString("list_ids", list);
+      prefs.setString("list_ids", list!);
       prefs.setString("name_${widget.widgetId}", _name).then((value) => prefs.setString("path_${widget.widgetId}", _image!).then((value) => _setActivityResult()));
     }();
   }
@@ -86,6 +88,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _isConfig = widget.widgetId != null;
     ReceiveIntent.setResult(kActivityResultCanceled);
     // _id = ModalRoute.of(context)!.settings.arguments as String;
     // This method is rerun every time setState is called, for instance as done
@@ -100,7 +103,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
         // the App.build method, and use it to set our appbar title.
         title: Text("New Icon"),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
