@@ -29,6 +29,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
   var _controller = TextEditingController(text: '');
   final ImagePicker _picker = ImagePicker();
 
+  static const platform = MethodChannel('samples.flutter.dev/widgets');
 
   Future<void> _chooseImage() async {
     var image = await _picker.pickImage(source: ImageSource.gallery);
@@ -53,15 +54,32 @@ class _NewIconScreenState extends State<NewIconScreen> {
     }
     () async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      var list = prefs.getString("list_ids");
-      if (list == null || list.isEmpty) {
-        list = widget.widgetId;
+      if(widget.widgetId == null) {
+        prefs.setString("name_new", _name).then((value) =>
+            prefs.setString("path_new", _image!).then((value) =>
+                _createAddWidget())).then((value) => SystemNavigator.pop());
       } else {
-        list += ",${widget.widgetId}";
+        var list = prefs.getString("list_ids");
+        if (list == null || list.isEmpty) {
+          list = widget.widgetId;
+        } else {
+          list += ",${widget.widgetId}";
+        }
+        prefs.setString("list_ids", list!);
+        prefs.setString("name_${widget.widgetId}", _name).then((value) =>
+            prefs.setString("path_${widget.widgetId}", _image!).then((value) =>
+                _setActivityResult()));
       }
-      prefs.setString("list_ids", list!);
-      prefs.setString("name_${widget.widgetId}", _name).then((value) => prefs.setString("path_${widget.widgetId}", _image!).then((value) => _setActivityResult()));
     }();
+  }
+
+  Future<void> _createAddWidget() async {
+    bool isSupportAddWidget;
+    try {
+      await platform.invokeMethod('createWidget');
+    } on PlatformException catch (e) {
+      //TODO need show message cant create widget
+    }
   }
 
   Future<void> _setActivityResult() async {

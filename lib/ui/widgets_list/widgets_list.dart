@@ -40,13 +40,32 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
   Map<String, String> _widgets = {};
   SharedPreferences? _prefs;
 
+  static const platform = MethodChannel('samples.flutter.dev/widgets');
+
+  bool? _isSupportAddWidget = null;
+
+  Future<void> _getIsSupportAddWidget() async {
+    bool isSupportAddWidget;
+    try {
+      final bool result = await platform.invokeMethod('isSupportAddWidget');
+      isSupportAddWidget = result;
+    } on PlatformException catch (e) {
+      isSupportAddWidget = false;
+    }
+
+    setState(() {
+      _isSupportAddWidget = isSupportAddWidget;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-        () async {
+    () async {
       _prefs = await SharedPreferences.getInstance();
       setState(() {});
     }();
+    _getIsSupportAddWidget();
     SystemChannels.lifecycle.setMessageHandler((msg) async {
       debugPrint('SystemChannels> $msg');
       if (msg == AppLifecycleState.resumed.toString() && _prefs != null) {
@@ -79,10 +98,10 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
   Widget build(BuildContext context) {
     if (_prefs != null) {
       _ids = _prefs!
-          .getString("list_ids")
-          ?.split(",")
-          .where((element) => element.isNotEmpty)
-          .toList() ??
+              .getString("list_ids")
+              ?.split(",")
+              .where((element) => element.isNotEmpty)
+              .toList() ??
           List.empty();
       for (var id in _ids) {
         _widgets["name_$id"] = _prefs!.getString("name_$id") ?? "";
@@ -105,15 +124,17 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: _prefs == null
+        child: _prefs == null && _isSupportAddWidget == null
             ? _initLoading()
             : (_ids.isEmpty ? _initEmpty() : _initList()),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addNew,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton:
+          _isSupportAddWidget == null || _isSupportAddWidget == false
+              ? SizedBox()
+              : FloatingActionButton(
+                  onPressed: _addNew,
+                  tooltip: 'Add new widget',
+                  child: Icon(Icons.add)), // This
     );
   }
 
@@ -195,8 +216,7 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Row(
             children: [
-              Image.file(File(path),
-                  width: 50, height: 50, fit: BoxFit.cover),
+              Image.file(File(path), width: 50, height: 50, fit: BoxFit.cover),
               Expanded(
                 flex: 1,
                 child: Padding(
