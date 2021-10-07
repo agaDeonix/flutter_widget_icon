@@ -12,7 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 
 class NewIconScreen extends StatefulWidget {
-
   String? widgetId;
 
   NewIconScreen(this.widgetId);
@@ -22,7 +21,6 @@ class NewIconScreen extends StatefulWidget {
 }
 
 class _NewIconScreenState extends State<NewIconScreen> {
-
   bool _isConfig = false;
   String _name = "";
   String? _image;
@@ -43,40 +41,50 @@ class _NewIconScreenState extends State<NewIconScreen> {
     if (_name.isEmpty) {
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Container(child: Text('Enter name'), alignment: AlignmentDirectional.center, height: 30,)));
+        ..showSnackBar(SnackBar(
+            content: Container(
+          child: Text('Enter name'),
+          alignment: AlignmentDirectional.center,
+          height: 30,
+        )));
       return;
     }
     if (_image == null || _image!.isEmpty) {
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Container(child: Text('Choose image'), alignment: AlignmentDirectional.center, height: 30,)));
+        ..showSnackBar(SnackBar(
+            content: Container(
+          child: Text('Choose image'),
+          alignment: AlignmentDirectional.center,
+          height: 30,
+        )));
       return;
     }
     () async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      if(widget.widgetId == null) {
-        prefs.setString("name_new", _name).then((value) =>
-            prefs.setString("path_new", _image!).then((value) =>
-                _createAddWidget())).then((value) => SystemNavigator.pop());
+      if (widget.widgetId == null) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("name_new", _name).then((value) => prefs
+            .setString("path_new", _image!)
+            .then((value) => _createAddWidget(_name, _image ?? "")));
       } else {
-        var list = prefs.getString("list_ids");
-        if (list == null || list.isEmpty) {
-          list = widget.widgetId;
-        } else {
-          list += ",${widget.widgetId}";
-        }
-        prefs.setString("list_ids", list!);
-        prefs.setString("name_${widget.widgetId}", _name).then((value) =>
-            prefs.setString("path_${widget.widgetId}", _image!).then((value) =>
-                _setActivityResult()));
+        saveWidgetData(widget.widgetId, _name, _image)
+            .then((value) => _setActivityResult());
       }
     }();
   }
 
-  Future<void> _createAddWidget() async {
-    bool isSupportAddWidget;
+  Future<void> _createAddWidget(String name, String path) async {
     try {
-      await platform.invokeMethod('createWidget');
+      final bool result = await platform
+          .invokeMethod('createWidget', {"name": name, "path": path});
+      if (result != null) {
+        // saveWidgetData(result, name, path).then((value) => SystemNavigator.pop());
+        Navigator.pop(context, true);
+      } else {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.remove("name_new");
+        prefs.remove("path_new");
+      }
     } on PlatformException catch (e) {
       //TODO need show message cant create widget
     }
@@ -84,24 +92,13 @@ class _NewIconScreenState extends State<NewIconScreen> {
 
   Future<void> _setActivityResult() async {
     developer.log('created_${widget.widgetId}', name: 'WIDGET');
-    // android_intent.Intent()
-    //   ..setAction("android.appwidget.action.APPWIDGET_UPDATE")
-    //   ..putExtra("appWidgetId", _id)
-    //   ..startActivity().catchError((e) => print(e));
-    // if (Platform.isAndroid) {
-    //   AndroidIntent intent = AndroidIntent(
-    //     action: 'android.appwidget.action.APPWIDGET_UPDATE',
-    //     data: 'package:com.pinkunicorp.widget_icon',
-    //     arguments: {'appWidgetId': _id},
-    //   );
-    //   await intent.launch();
-    // }
     HomeWidget.updateWidget(
       name: 'SimpleAppWidget',
       androidName: 'SimpleAppWidget',
       iOSName: 'SimpleAppWidget',
     );
-    await ReceiveIntent.setResult(kActivityResultOk).then((value) => SystemNavigator.pop());
+    await ReceiveIntent.setResult(kActivityResultOk)
+        .then((value) => SystemNavigator.pop());
   }
 
   @override
@@ -121,7 +118,8 @@ class _NewIconScreenState extends State<NewIconScreen> {
         // the App.build method, and use it to set our appbar title.
         title: Text("New Icon"),
         leading: IconButton(
-          icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.white),
+          icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back,
+              color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
@@ -181,17 +179,32 @@ class _NewIconScreenState extends State<NewIconScreen> {
             new LayoutBuilder(builder: (context, constraint) {
               return _image == null
                   ? SvgPicture.asset(
-                "assets/images/ic_placeholder.svg",
-                width: constraint.biggest.width,
-              )
+                      "assets/images/ic_placeholder.svg",
+                      width: constraint.biggest.width,
+                    )
                   : Image.file(
-                File(_image!),
-                width: constraint.biggest.width,
-              );
+                      File(_image!),
+                      width: constraint.biggest.width,
+                    );
             })
           ],
         ),
       )), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Future<void> saveWidgetData(
+      String? widgetId, String name, String? image) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var list = prefs.getString("list_ids");
+    if (list == null || list.isEmpty) {
+      list = widget.widgetId;
+    } else {
+      list += ",${widget.widgetId}";
+    }
+    prefs.setString("list_ids", list!);
+    return prefs
+        .setString("name_${widget.widgetId}", _name)
+        .then((value) => prefs.setString("path_${widget.widgetId}", _image!));
   }
 }

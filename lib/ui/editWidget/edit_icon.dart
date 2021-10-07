@@ -77,16 +77,16 @@ class _EditIconScreenState extends State<EditIconScreen> {
         context: context,
         builder: (BuildContext context) => AlertDialog(
               title: const Text('Deleting icon'),
-              content: const Text('Are you sure?'),
+              content: const Text('For deleting find widget on HomeScreen and delete it manually'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancel'),
+                  child: const Text('Ok'),
                 ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Yes'),
-                ),
+                // TextButton(
+                //   onPressed: () => Navigator.pop(context, true),
+                //   child: const Text('Yes'),
+                // ),
               ],
             )).then((value) {
       if (value ?? false) {
