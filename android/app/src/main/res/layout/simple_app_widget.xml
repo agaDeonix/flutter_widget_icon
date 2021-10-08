@@ -9,17 +9,32 @@
     android:orientation="vertical"
     android:padding="5dp">
 
-    <ImageView
-        android:id="@+id/ivIcon"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"
-        tools:ignore="ContentDescription"
-        android:background="@android:color/holo_red_dark"
-        tools:src="@android:color/black"
-        android:layout_margin="5dp"/>
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/ivIcon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_margin="5dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/holo_red_dark"
+            android:scaleType="fitXY"
+            tools:ignore="ContentDescription"
+            tools:src="@android:color/black" />
+
+        <ImageView
+            android:layout_width="@dimen/shortcut_icon_size"
+            android:layout_height="@dimen/shortcut_icon_size"
+            android:layout_alignStart="@id/ivIcon"
+            android:layout_alignLeft="@id/ivIcon"
+            android:layout_alignBottom="@id/ivIcon"
+            tools:ignore="ContentDescription"
+            android:src="@drawable/ic_showrtcut" />
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/tvName"
