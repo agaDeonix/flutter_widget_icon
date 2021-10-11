@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:receive_intent/receive_intent.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:widget_icon/ui/editWidget/edit_icon.dart';
 import 'package:widget_icon/ui/newWidget/new_icon.dart';
 import 'package:widget_icon/ui/widgets_list/widgets_list.dart';
@@ -18,6 +19,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   var isWait = true;
   var isNewIconMode = false;
+  var isEditIconMode = false;
   var widgetId = "";
 
   @override
@@ -33,20 +35,6 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     if (isWait) {
       return Column(
-        // Column is also a layout widget. It takes a list of children and
-        // arranges them vertically. By default, it sizes itself to fit its
-        // children horizontally, and tries to be as tall as its parent.
-        //
-        // Invoke "debug painting" (press "p" in the console, choose the
-        // "Toggle Debug Paint" action from the Flutter Inspector in Android
-        // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-        // to see the wireframe for each widget.
-        //
-        // Column has various properties to control how it sizes itself and
-        // how it positions its children. Here we use mainAxisAlignment to
-        // center the children vertically; the main axis here is the vertical
-        // axis because Columns are vertical (the cross axis would be
-        // horizontal).
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           SizedBox(
@@ -60,6 +48,33 @@ class _MyAppState extends State<MyApp> {
           ),
         ],
       );
+      // return MaterialApp(
+      //   title: 'Widget icon',
+      //   home: Scaffold(
+      //     appBar: AppBar(
+      //       // Here we take the value from the MyHomePage object that was created by
+      //       // the App.build method, and use it to set our appbar title.
+      //       title: Text("Widgets list"),
+      //     ),
+      //     body: Column(
+      //       mainAxisAlignment: MainAxisAlignment.center,
+      //       children: <Widget>[
+      //         SizedBox(
+      //           width: 50,
+      //           height: 50,
+      //           child: CircularProgressIndicator(
+      //             strokeWidth: 5,
+      //             backgroundColor: Colors.white,
+      //             valueColor: new AlwaysStoppedAnimation<Color>(Colors.blue),
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      //   theme: ThemeData(
+      //     primarySwatch: Colors.blue,
+      //   ),
+      // );
     } else {
       if (isNewIconMode) {
         return MaterialApp(
@@ -69,15 +84,22 @@ class _MyAppState extends State<MyApp> {
             primarySwatch: Colors.blue,
           ),
         );
+      } else if (isEditIconMode) {
+        return MaterialApp(
+          title: 'Widget icon',
+          home: EditIconScreen(widgetId),
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+        );
       } else {
         return MaterialApp(
           title: 'Widget icon',
-          initialRoute: isNewIconMode ? '/add_new' : "/",
+          initialRoute: '/',
           routes: {
-            // When navigating to the "/" route, build the FirstScreen widget.
             '/': (context) => WidgetsListScreen(),
             '/add_new': (context) => NewIconScreen(null),
-            '/edit': (context) => EditIconScreen(),
+            '/edit': (context) => EditIconScreen(null),
           },
           theme: ThemeData(
             primarySwatch: Colors.blue,
@@ -89,14 +111,20 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _initReceiveIntent(BuildContext context) async {
     // Platform messages may fail, so we use a try/catch PlatformException.
-    var value = false;
+    var isNewValue = false;
+    var isEditValue = false;
     try {
       final receivedIntent = await ReceiveIntent.getInitialIntent();
-      if (receivedIntent != null &&
-          receivedIntent.action ==
-              "android.appwidget.action.APPWIDGET_CONFIGURE") {
+      if (receivedIntent != null && receivedIntent.action == "android.appwidget.action.APPWIDGET_CONFIGURE") {
         widgetId = receivedIntent.extra!["appWidgetId"].toString();
-        value = true;
+        var prefs = await SharedPreferences.getInstance();
+        var widgetName = prefs.getString("name_$widgetId") ?? "";
+        var widgetPath = prefs.getString("path_$widgetId") ?? "";
+        if (widgetName.isNotEmpty && widgetPath.isNotEmpty) {
+          isEditValue = true;
+        } else {
+          isNewValue = true;
+        }
       }
       // Validate receivedIntent and warn the user, if it is not correct,
       // but keep in mind it could be `null` or "empty"(`receivedIntent.isNull`).
@@ -105,7 +133,8 @@ class _MyAppState extends State<MyApp> {
     }
     isWait = false;
     setState(() {
-      isNewIconMode = value;
+      isNewIconMode = isNewValue;
+      isEditIconMode = isEditValue;
     });
   }
 }

@@ -8,5 +8,6 @@
     android:minWidth="54dp"
     android:previewImage="@android:drawable/ic_menu_add"
     android:updatePeriodMillis="0"
+    android:widgetFeatures="reconfigurable"
     android:widgetCategory="home_screen">
 </appwidget-provider>

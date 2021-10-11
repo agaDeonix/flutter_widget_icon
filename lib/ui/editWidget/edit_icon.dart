@@ -2,17 +2,23 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EditIconScreen extends StatefulWidget {
+  String? widgetId;
+
+  EditIconScreen(this.widgetId);
+
   @override
   _EditIconScreenState createState() => _EditIconScreenState();
 }
 
 class _EditIconScreenState extends State<EditIconScreen> {
+  bool _isConfig = false;
   String _id = "";
   String _name = "";
   String? _image;
@@ -68,7 +74,11 @@ class _EditIconScreenState extends State<EditIconScreen> {
         androidName: 'SimpleAppWidget',
         iOSName: 'SimpleAppWidget',
       );
-      Navigator.pop(context, true);
+      if (_isConfig) {
+        SystemNavigator.pop();
+      } else {
+        Navigator.pop(context, true);
+      }
     }();
   }
 
@@ -108,7 +118,12 @@ class _EditIconScreenState extends State<EditIconScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _id = ModalRoute.of(context)!.settings.arguments as String;
+    _isConfig = widget.widgetId != null;
+    if (_isConfig) {
+      _id = widget.widgetId!;
+    } else {
+      _id = ModalRoute.of(context)!.settings.arguments as String;
+    }
     if (_prefs != null && _image == null) {
       _name = _prefs!.getString("name_$_id") ?? "";
       _image = _prefs!.getString("path_$_id") ?? "";
@@ -121,8 +136,14 @@ class _EditIconScreenState extends State<EditIconScreen> {
         // the App.build method, and use it to set our appbar title.
         title: Text("Edit Icon"),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            if (_isConfig) {
+              SystemNavigator.pop();
+            } else {
+              Navigator.of(context).pop();
+            }
+          },
         ),
         actions: [
           Padding(
@@ -174,9 +195,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
                 children: <Widget>[
                   TextField(
                     controller: _controller,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Enter a icon name'),
+                    decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Enter a icon name'),
                     onChanged: (value) {
                       setState(() {
                         _name = value;
@@ -186,9 +205,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 15, bottom: 15),
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          textStyle: const TextStyle(fontSize: 16),
-                          minimumSize: Size(double.infinity, 44)),
+                      style: ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 16), minimumSize: Size(double.infinity, 44)),
                       onPressed: () => {_chooseImage()},
                       child: Text('Choose image'),
                     ),
