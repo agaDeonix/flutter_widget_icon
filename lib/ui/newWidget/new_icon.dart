@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:android_intent/android_intent.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,13 +23,15 @@ class NewIconScreen extends StatefulWidget {
 class _NewIconScreenState extends State<NewIconScreen> {
   bool _isConfig = false;
   String _name = "";
+  String _path = "";
   String? _image;
-  var _controller = TextEditingController(text: '');
+  var _nameController = TextEditingController(text: '');
+  var _linkController = TextEditingController(text: '');
   final ImagePicker _picker = ImagePicker();
 
   // create some values
-  Color pickerColor = Color(0xff443a49);
-  Color currentColor = Color(0xff443a49);
+  Color pickerColor = Colors.black;
+  Color currentColor = Colors.black;
 
   String dropdownValue = 'Image';
 
@@ -40,17 +41,8 @@ class _NewIconScreenState extends State<NewIconScreen> {
   Widget build(BuildContext context) {
     _isConfig = widget.widgetId != null;
     ReceiveIntent.setResult(kActivityResultCanceled);
-    // _id = ModalRoute.of(context)!.settings.arguments as String;
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text("New Icon"),
         leading: IconButton(
           icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.white),
@@ -83,7 +75,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
         child: Column(
           children: <Widget>[
             TextField(
-              controller: _controller,
+              controller: _nameController,
               decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Enter a icon name'),
               onChanged: (value) {
                 setState(() {
@@ -124,11 +116,11 @@ class _NewIconScreenState extends State<NewIconScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 15),
               child: Align(
-                alignment: Alignment.topLeft,
+                  alignment: Alignment.topLeft,
                   child: Text(
-                "Icon type",
-                style: const TextStyle(color: Colors.black45, fontSize: 14),
-              )),
+                    "Icon type",
+                    style: const TextStyle(color: Colors.black45, fontSize: 14),
+                  )),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 0.0),
@@ -149,28 +141,52 @@ class _NewIconScreenState extends State<NewIconScreen> {
                 }).toList(),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 15, bottom: 15),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 16), minimumSize: Size(double.infinity, 44)),
-                onPressed: () => {_chooseImage()},
-                child: Text('Choose image'),
-              ),
-            ),
-            new LayoutBuilder(builder: (context, constraint) {
-              return _image == null
-                  ? SvgPicture.asset(
-                      "assets/images/ic_placeholder.svg",
-                      width: constraint.biggest.width,
-                    )
-                  : Image.file(
-                      File(_image!),
-                      width: constraint.biggest.width,
-                    );
-            }),
+            initLayoutByType()
           ],
         ),
       )), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  Widget initPhoto() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 15, bottom: 15),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 16), minimumSize: Size(double.infinity, 44)),
+            onPressed: () => {_chooseImage()},
+            child: Text('Choose image'),
+          ),
+        ),
+        new LayoutBuilder(builder: (context, constraint) {
+          return _image == null
+              ? SvgPicture.asset(
+                  "assets/images/ic_placeholder.svg",
+                  width: constraint.biggest.width,
+                )
+              : Image.file(
+                  File(_image!),
+                  width: constraint.biggest.width,
+                );
+        }),
+      ],
+    );
+  }
+
+  Widget initLink() {
+    return Column(
+      children: [
+        TextField(
+          controller: _linkController,
+          decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Enter URL'),
+          onChanged: (value) {
+            setState(() {
+              _path = value;
+            });
+          },
+        ),
+      ],
     );
   }
 
@@ -233,35 +249,46 @@ class _NewIconScreenState extends State<NewIconScreen> {
   void _onComleteClicked() {
     FocusScope.of(context).unfocus();
     if (_name.isEmpty) {
-      ScaffoldMessenger.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-            content: Container(
-          child: Text('Enter name'),
-          alignment: AlignmentDirectional.center,
-          height: 30,
-        )));
+      _showError('Enter name');
       return;
     }
-    if (_image == null || _image!.isEmpty) {
-      ScaffoldMessenger.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-            content: Container(
-          child: Text('Choose image'),
-          alignment: AlignmentDirectional.center,
-          height: 30,
-        )));
-      return;
-    }
-    () async {
-      if (widget.widgetId == null) {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString("name_new", _name).then((value) => prefs.setString("path_new", _image!).then((value) => _createAddWidget(_name, _image ?? "")));
-      } else {
-        saveWidgetData(widget.widgetId, _name, _image).then((value) => _setActivityResult());
+    var textColor = '#${pickerColor.value.toRadixString(16)}';
+    if (dropdownValue == "Image") {
+      if (_image == null || _image!.isEmpty) {
+        _showError('Choose image');
+        return;
       }
-    }();
+      () async {
+        if (widget.widgetId == null) {
+          saveNewWidgetData(_name, textColor, 0, _image!).then((value) => _createAddWidget(_name, _image ?? ""));
+        } else {
+          saveWidgetData(widget.widgetId!, _name, textColor, 0, _image!).then((value) => _setActivityResult());
+        }
+      }();
+    } else {
+      if (_path.isEmpty) {
+        _showError('Enter URL');
+        return;
+      }
+      () async {
+        if (widget.widgetId == null) {
+          saveNewWidgetData(_name, textColor, 1, _path).then((value) => _createAddWidget(_name, _image ?? ""));
+        } else {
+          saveWidgetData(widget.widgetId!, _name, textColor, 1, _path).then((value) => _setActivityResult());
+        }
+      }();
+    }
+  }
+
+  void _showError(String error) {
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+          content: Container(
+        child: Text(error),
+        alignment: AlignmentDirectional.center,
+        height: 30,
+      )));
   }
 
   Future<void> _createAddWidget(String name, String path) async {
@@ -274,6 +301,8 @@ class _NewIconScreenState extends State<NewIconScreen> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.remove("name_new");
         prefs.remove("path_new");
+        prefs.remove("text_color_new");
+        prefs.remove("type_new");
       }
     } on PlatformException catch (e) {
       //TODO need show message cant create widget
@@ -296,15 +325,28 @@ class _NewIconScreenState extends State<NewIconScreen> {
     });
   }
 
-  Future<void> saveWidgetData(String? widgetId, String name, String? image) async {
+  Future<void> saveWidgetData(String widgetId, String name, String textColor, int type, String path) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var list = prefs.getString("list_ids");
     if (list == null || list.isEmpty) {
-      list = widget.widgetId;
+      list = widgetId;
     } else {
-      list += ",${widget.widgetId}";
+      list += ",${widgetId}";
     }
-    prefs.setString("list_ids", list!);
-    return prefs.setString("name_${widget.widgetId}", _name).then((value) => prefs.setString("path_${widget.widgetId}", _image!));
+    prefs.setString("list_ids", list);
+    return prefs.setString("name_${widgetId}", name).then((value) => prefs.setString("text_color_${widgetId}", textColor)).then((value) => prefs.setString("type_${widgetId}", type.toString())).then((value) => prefs.setString("path_${widgetId}", path));
+  }
+
+  Future<void> saveNewWidgetData(String name, String textColor, int type, String path) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString("name_new", name).then((value) => prefs.setString("text_color_new", textColor)).then((value) => prefs.setString("type_new", type.toString())).then((value) => prefs.setString("path_new", path));
+  }
+
+  Widget initLayoutByType() {
+    if (dropdownValue == "Image") {
+      return initPhoto();
+    } else {
+      return initLink();
+    }
   }
 }

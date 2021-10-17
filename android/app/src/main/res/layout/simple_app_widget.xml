@@ -20,7 +20,6 @@
             android:layout_gravity="top"
             android:layout_margin="5dp"
             android:adjustViewBounds="true"
-            android:background="@android:color/holo_red_dark"
             android:scaleType="fitXY"
             tools:ignore="ContentDescription"
             tools:src="@android:color/black" />

@@ -1,13 +1,12 @@
 package com.pinkunicorp.widget_icon
 
 import android.app.Activity
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.os.ResultReceiver
 import android.util.Log
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity
@@ -15,23 +14,22 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 
-class MainActivity: FlutterActivity() {
+class MainActivity : FlutterActivity() {
 
     private val CHANNEL = "samples.flutter.dev/widgets"
     private var resultAddWidget: MethodChannel.Result? = null
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler {
-                call, result ->
-            when(call.method) {
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
                 "isSupportAddWidget" -> {
                     Log.e("FLUTTER_CHANNEL", "call method: isSupportAddWidget; result: ${isSupportAddWidget()}")
                     result.success(isSupportAddWidget())
                 }
                 "createWidget" -> {
                     resultAddWidget = result
-                    createWidget(call.argument("name") ?: "", call.argument("path") ?: "")
+                    createWidget(call.argument("name") ?: "", call.argument("textColor") ?: "#ffffffff", call.argument("type") ?: 0, call.argument("path") ?: "")
                 }
                 else -> result.notImplemented()
             }
@@ -46,17 +44,17 @@ class MainActivity: FlutterActivity() {
         return false
     }
 
-    private fun createWidget(name: String, path: String) {
+    private fun createWidget(name: String, textColor: String, type: Int, path: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val mAppWidgetManager = getSystemService(AppWidgetManager::class.java)
             val myProvider = ComponentName(this, SimpleAppWidget::class.java)
             if (mAppWidgetManager.isRequestPinAppWidgetSupported) {
 
-                val remoteViews = SimpleAppWidget.getRemoteViews(this, name, path)
+                val remoteViews = SimpleAppWidget.getRemoteViews(this, name, textColor, type, path)
                 val bundle = Bundle()
                 bundle.putParcelable(AppWidgetManager.EXTRA_APPWIDGET_PREVIEW, remoteViews)
 
-                mAppWidgetManager.requestPinAppWidget(myProvider, bundle, SimpleAppWidget.getPendingIntent(this, name, path))
+                mAppWidgetManager.requestPinAppWidget(myProvider, bundle, SimpleAppWidget.getPendingIntent(this, name, textColor, type, path))
             }
         }
     }

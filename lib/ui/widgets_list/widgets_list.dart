@@ -97,15 +97,11 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
   @override
   Widget build(BuildContext context) {
     if (_prefs != null) {
-      _ids = _prefs!
-              .getString("list_ids")
-              ?.split(",")
-              .where((element) => element.isNotEmpty)
-              .toList() ??
-          List.empty();
+      _ids = _prefs!.getString("list_ids")?.split(",").where((element) => element.isNotEmpty).toList() ?? List.empty();
       for (var id in _ids) {
         _widgets["name_$id"] = _prefs!.getString("name_$id") ?? "";
         _widgets["path_$id"] = _prefs!.getString("path_$id") ?? "";
+        _widgets["type_$id"] = (_prefs!.getString("type_$id") ?? "0");
       }
     }
 
@@ -124,17 +120,9 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: _prefs == null && _isSupportAddWidget == null
-            ? _initLoading()
-            : (_ids.isEmpty ? _initEmpty() : _initList()),
+        child: _prefs == null && _isSupportAddWidget == null ? _initLoading() : (_ids.isEmpty ? _initEmpty() : _initList()),
       ),
-      floatingActionButton:
-          _isSupportAddWidget == null || _isSupportAddWidget == false
-              ? SizedBox()
-              : FloatingActionButton(
-                  onPressed: _addNew,
-                  tooltip: 'Add new widget',
-                  child: Icon(Icons.add)), // This
+      floatingActionButton: _isSupportAddWidget == null || _isSupportAddWidget == false ? SizedBox() : FloatingActionButton(onPressed: _addNew, tooltip: 'Add new widget', child: Icon(Icons.add)), // This
     );
   }
 
@@ -207,6 +195,11 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
   Widget _initItem(String id, bool isFirst, bool isLast) {
     var name = _widgets["name_$id"]!;
     var path = _widgets["path_$id"]!;
+    var type = int.parse(_widgets["type_$id"]!);
+    var typeText = "Image";
+    if (type == 1) {
+      typeText = "Link";
+    }
     return GestureDetector(
       onTap: () => _editItem(id),
       child: Card(
@@ -216,7 +209,7 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Row(
             children: [
-              Image.file(File(path), width: 50, height: 50, fit: BoxFit.cover),
+              getImageByType(type, path),
               Expanded(
                 flex: 1,
                 child: Padding(
@@ -226,13 +219,12 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
                     children: [
                       Text(
                         name,
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(
                         height: 15,
                       ),
-                      Text("type: Image"),
+                      Text("type: $typeText"),
                     ],
                   ),
                 ),
@@ -247,5 +239,13 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
         ),
       ),
     );
+  }
+
+  Widget getImageByType(int type, String path) {
+    if (type == 0) {
+      return Image.file(File(path), width: 50, height: 50, fit: BoxFit.cover);
+    } else {
+      return Image.asset("assets/images/ic_url.png", width: 50, height: 50, fit: BoxFit.cover);
+    }
   }
 }
