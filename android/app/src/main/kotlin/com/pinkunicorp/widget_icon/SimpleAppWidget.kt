@@ -80,7 +80,7 @@ class SimpleAppWidget : AppWidgetProvider() {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.setDataAndType(pathFile, "image/*")
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+            PendingIntent.getActivity(context, 0, intent, android.app.PendingIntent.FLAG_UPDATE_CURRENT)
         } else {
             var newPath = path
             if (!path.startsWith("http://") && !path.startsWith("https://")) {
@@ -100,7 +100,7 @@ class SimpleAppWidget : AppWidgetProvider() {
         }
         editor.putString("flutter.name_$widgetId", name)
         editor.putString("flutter.text_color_$widgetId", textColor)
-        editor.putInt("flutter.type_$widgetId", type)
+        editor.putString("flutter.type_$widgetId", type.toString())
         editor.putString("flutter.path_$widgetId", path)
         editor.remove("flutter.name_new")
         editor.remove("flutter.text_color_new")
