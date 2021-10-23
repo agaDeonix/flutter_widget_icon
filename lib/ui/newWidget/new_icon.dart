@@ -316,13 +316,12 @@ class _NewIconScreenState extends State<NewIconScreen> {
       androidName: 'SimpleAppWidget',
       iOSName: 'SimpleAppWidget',
     );
-    await ReceiveIntent.setResult(kActivityResultOk).then((value) {
-      if (_isConfig) {
-        SystemNavigator.pop();
-      } else {
-        Navigator.of(context).pop();
-      }
-    });
+    await platform.invokeMethod('setConfigResult', {"id": widget.widgetId});
+    if (_isConfig) {
+      SystemNavigator.pop();
+    } else {
+      Navigator.of(context).pop();
+    }
   }
 
   Future<void> saveWidgetData(String widgetId, String name, String textColor, int type, String path) async {
@@ -334,7 +333,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
       list += ",${widgetId}";
     }
     prefs.setString("list_ids", list);
-    return prefs.setString("name_${widgetId}", name).then((value) => prefs.setString("text_color_${widgetId}", textColor)).then((value) => prefs.setString("type_${widgetId}", type.toString())).then((value) => prefs.setString("path_${widgetId}", path));
+    return prefs.setBool("deleted_$widgetId", false).then((value) => prefs.setString("name_${widgetId}", name)).then((value) => prefs.setString("text_color_${widgetId}", textColor)).then((value) => prefs.setString("type_${widgetId}", type.toString())).then((value) => prefs.setString("path_${widgetId}", path));
   }
 
   Future<void> saveNewWidgetData(String name, String textColor, int type, String path) async {

@@ -101,7 +101,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
 
   Future<void> saveWidgetData(String widgetId, String name, String textColor, int type, String path) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.setString("name_${widgetId}", name).then((value) => prefs.setString("text_color_${widgetId}", textColor)).then((value) => prefs.setString("type_${widgetId}", type.toString())).then((value) => prefs.setString("path_${widgetId}", path));
+    return prefs.setBool("deleted_$_id", false).then((value) => prefs.setString("name_${widgetId}", name)).then((value) => prefs.setString("text_color_${widgetId}", textColor)).then((value) => prefs.setString("type_${widgetId}", type.toString())).then((value) => prefs.setString("path_${widgetId}", path));
   }
 
   void _showError(String error) {
@@ -120,16 +120,16 @@ class _EditIconScreenState extends State<EditIconScreen> {
         context: context,
         builder: (BuildContext context) => AlertDialog(
               title: const Text('Deleting icon'),
-              content: const Text('For deleting find widget on HomeScreen and delete it manually'),
+              content: const Text('Are you sure?'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Ok'),
+                  child: const Text('No'),
                 ),
-                // TextButton(
-                //   onPressed: () => Navigator.pop(context, true),
-                //   child: const Text('Yes'),
-                // ),
+                TextButton(
+                  onPressed: () => _remove(),
+                  child: const Text('Yes'),
+                ),
               ],
             )).then((value) {
       if (value ?? false) {
@@ -147,6 +147,14 @@ class _EditIconScreenState extends State<EditIconScreen> {
       _prefs!.remove("path_$_id");
       _prefs!.remove("text_color_$_id");
       _prefs!.remove("type_$_id");
+      _prefs!.setBool("deleted_$_id", true);
+
+      HomeWidget.updateWidget(
+        name: 'SimpleAppWidget',
+        androidName: 'SimpleAppWidget',
+        iOSName: 'SimpleAppWidget',
+      );
+
       Navigator.pop(context, true);
     }();
   }

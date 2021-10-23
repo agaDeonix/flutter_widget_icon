@@ -4,7 +4,6 @@ import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -30,6 +29,10 @@ class MainActivity : FlutterActivity() {
                 "createWidget" -> {
                     resultAddWidget = result
                     createWidget(call.argument("name") ?: "", call.argument("textColor") ?: "#ffffffff", call.argument("type") ?: 0, call.argument("path") ?: "")
+                }
+                "setConfigResult" -> {
+                    setConfigResult(call.argument("id") ?: "-1")
+                    result.success(true)
                 }
                 else -> result.notImplemented()
             }
@@ -76,6 +79,12 @@ class MainActivity : FlutterActivity() {
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
+    }
+
+    fun setConfigResult(id: String) {
+        val updateIntent = Intent()
+        updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id.toInt())
+        setResult(Activity.RESULT_OK, updateIntent)
     }
 
     companion object {

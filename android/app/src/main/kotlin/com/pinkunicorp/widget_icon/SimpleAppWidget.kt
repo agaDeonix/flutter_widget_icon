@@ -1,6 +1,5 @@
 package com.pinkunicorp.widget_icon
 
-import android.app.Activity
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -25,52 +24,49 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.net.MalformedURLException
 
-
-/**
- * Implementation of App Widget functionality.
- */
 class SimpleAppWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        // There may be multiple widgets active, so update all of them
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
     }
 
     private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-
         val sharedPref = context.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
-        var name = sharedPref.getString("flutter.name_$appWidgetId", "")
-        var textColor = sharedPref.getString("flutter.text_color_$appWidgetId", null) ?: "#ffffffff"
-        var type = sharedPref.getString("flutter.type_$appWidgetId", "0")?.toInt() ?: 0
-        var path = sharedPref.getString("flutter.path_$appWidgetId", "")
-        if (name.isNullOrBlank() && path.isNullOrBlank()) {
-            name = sharedPref.getString("flutter.name_new", "")
-            textColor = sharedPref.getString("flutter.text_color_new", null) ?: "#ffffffff"
-            type = sharedPref.getString("flutter.type_new", "0")?.toInt() ?: 0
-            path = sharedPref.getString("flutter.path_new", "")
+        val isDeleted = sharedPref.getBoolean("flutter.deleted_$appWidgetId", false)
+        if (!isDeleted) {
+            var name = sharedPref.getString("flutter.name_$appWidgetId", "")
+            var textColor = sharedPref.getString("flutter.text_color_$appWidgetId", null) ?: "#ffffffff"
+            var type = sharedPref.getString("flutter.type_$appWidgetId", "0")?.toInt() ?: 0
+            var path = sharedPref.getString("flutter.path_$appWidgetId", "")
             if (name.isNullOrBlank() && path.isNullOrBlank()) {
-                return
+                name = sharedPref.getString("flutter.name_new", "")
+                textColor = sharedPref.getString("flutter.text_color_new", null) ?: "#ffffffff"
+                type = sharedPref.getString("flutter.type_new", "0")?.toInt() ?: 0
+                path = sharedPref.getString("flutter.path_new", "")
+                if (name.isNullOrBlank() && path.isNullOrBlank()) {
+                    return
+                }
+                saveWidgetData(context, sharedPref, appWidgetId, name!!, textColor, type, path!!)
             }
-            saveWidgetData(context, sharedPref, appWidgetId, name!!, textColor, type, path!!)
+            // Construct the RemoteViews object
+            val views = RemoteViews(context.packageName, R.layout.simple_app_widget)
+
+            try {
+                initWidget(views, name, textColor, type, path)
+                views.setOnClickPendingIntent(R.id.root, getPendingIntent(context, type, path!!))
+            } catch (e: MalformedURLException) {
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+            appWidgetManager.updateAppWidget(appWidgetId, views)
+        } else {
+            val views = RemoteViews(context.packageName, R.layout.simple_app_widget)
+//            views.setOnClickPendingIntent(R.id.root, getPendingIntent(context, type, path!!))
+            appWidgetManager.updateAppWidget(appWidgetId, views)
         }
-        // Construct the RemoteViews object
-        val views = RemoteViews(context.packageName, R.layout.simple_app_widget)
-
-        try {
-            initWidget(views, name, textColor, type, path)
-
-            views.setOnClickPendingIntent(R.id.root, getPendingIntent(context, type, path!!))
-
-        } catch (e: MalformedURLException) {
-            e.printStackTrace()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
-        // Instruct the widget manager to update the widget
-        appWidgetManager.updateAppWidget(appWidgetId, views)
     }
 
     private fun getPendingIntent(context: Context, type: Int, path: String): PendingIntent {
@@ -129,6 +125,9 @@ class SimpleAppWidget : AppWidgetProvider() {
         for (appWidgetId in appWidgetIds) {
             editor.remove("flutter.name_$appWidgetId")
             editor.remove("flutter.path_$appWidgetId")
+            editor.remove("flutter.text_color_$appWidgetId")
+            editor.remove("flutter.type_$appWidgetId")
+            editor.remove("flutter.deleted_$appWidgetId")
         }
         editor.apply()
     }
