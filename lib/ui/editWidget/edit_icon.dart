@@ -10,12 +10,18 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EditIconScreen extends StatefulWidget {
-  String? widgetId;
 
-  EditIconScreen(this.widgetId);
+  const EditIconScreen({Key? key}) : super(key: key);
 
   @override
   _EditIconScreenState createState() => _EditIconScreenState();
+}
+
+class EditIconArguments {
+  String? widgetId;
+  bool isConfig;
+
+  EditIconArguments(this.widgetId, this.isConfig);
 }
 
 class _EditIconScreenState extends State<EditIconScreen> {
@@ -54,13 +60,13 @@ class _EditIconScreenState extends State<EditIconScreen> {
   void _onComleteClicked() {
     FocusScope.of(context).unfocus();
     if (_name.isEmpty) {
-      _showError('Enter name');
+      _showError('Необходимо ввести имя');
       return;
     }
     var textColor = '#${pickerColor.value.toRadixString(16)}';
     if (dropdownValue == "Image") {
       if (_image == null || _image!.isEmpty) {
-        _showError('Choose image');
+        _showError('Выберите изображение');
         return;
       }
       () async {
@@ -119,17 +125,17 @@ class _EditIconScreenState extends State<EditIconScreen> {
     showDialog<bool>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-              title: const Text('Deleting icon'),
-              content: const Text('Are you sure?'),
+              title: const Text('Удаление'),
+              content: const Text('Удалить виджет можно только вручную с рабочего стола, найдите виджет на рабочем столе и удалите его вручную.'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text('No'),
+                  child: const Text('Хорошо'),
                 ),
-                TextButton(
-                  onPressed: () => _remove(),
-                  child: const Text('Yes'),
-                ),
+                // TextButton(
+                //   onPressed: () => _remove(),
+                //   child: const Text('Yes'),
+                // ),
               ],
             )).then((value) {
       if (value ?? false) {
@@ -168,12 +174,10 @@ class _EditIconScreenState extends State<EditIconScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _isConfig = widget.widgetId != null;
-    if (_isConfig) {
-      _id = widget.widgetId!;
-    } else {
-      _id = ModalRoute.of(context)!.settings.arguments as String;
-    }
+    final args = ModalRoute.of(context)!.settings.arguments as EditIconArguments;
+    _isConfig = args.isConfig;
+    _id = args.widgetId ?? "";
+
     if (_prefs != null && _image == null && _path == null) {
       _name = _prefs!.getString("name_$_id") ?? "";
       dropdownValue = (int.parse(_prefs!.getString("type_$_id") ?? "0")) == 0 ? "Image" : "Link";
@@ -193,7 +197,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text("Edit Icon"),
+        title: Text("Редактирование виджета"),
         leading: IconButton(
           icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -254,7 +258,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
                 children: <Widget>[
                   TextField(
                     controller: _nameController,
-                    decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Enter a icon name'),
+                    decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Введите имя виджета'),
                     onChanged: (value) {
                       setState(() {
                         _name = value;
@@ -284,7 +288,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 16), minimumSize: Size(double.infinity, 44)),
                               onPressed: () => {_pickColor()},
-                              child: Text('Text color'),
+                              child: Text('Цвет надписи в виджете'),
                             ),
                           ),
                         ),
@@ -364,7 +368,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 16), minimumSize: Size(double.infinity, 44)),
             onPressed: () => {_chooseImage()},
-            child: Text('Choose image'),
+            child: Text('Выберите изображение'),
           ),
         ),
         new LayoutBuilder(builder: (context, constraint) {
@@ -406,7 +410,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('Pick a color!'),
+        title: const Text('Выберите цвет'),
         content: SingleChildScrollView(
           child: ColorPicker(
             pickerColor: pickerColor,
@@ -436,7 +440,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
         ),
         actions: <Widget>[
           FlatButton(
-            child: const Text('Got it'),
+            child: const Text('Выбрать'),
             onPressed: () {
               setState(() => currentColor = pickerColor);
               Navigator.of(context).pop();

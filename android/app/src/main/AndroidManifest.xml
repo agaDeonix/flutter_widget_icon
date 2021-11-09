@@ -2,7 +2,7 @@
     package="com.pinkunicorp.widget_icon">
    <application
         android:label="widget_icon"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher_android">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

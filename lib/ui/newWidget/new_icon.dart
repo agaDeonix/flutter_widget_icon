@@ -12,16 +12,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 
 class NewIconScreen extends StatefulWidget {
-  String? widgetId;
 
-  NewIconScreen(this.widgetId);
+  const NewIconScreen({Key? key}) : super(key: key);
 
   @override
   _NewIconScreenState createState() => _NewIconScreenState();
 }
 
+class NewIconArguments {
+  String? widgetId;
+  bool isConfig;
+
+  NewIconArguments(this.widgetId, this.isConfig);
+  
+}
+
 class _NewIconScreenState extends State<NewIconScreen> {
   bool _isConfig = false;
+  String? _widgetId = null;
   String _name = "";
   String _path = "";
   String? _image;
@@ -39,11 +47,13 @@ class _NewIconScreenState extends State<NewIconScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _isConfig = widget.widgetId != null;
+    final args = ModalRoute.of(context)!.settings.arguments as NewIconArguments;
+    _isConfig = args.isConfig;
+    _widgetId = args.widgetId;
     ReceiveIntent.setResult(kActivityResultCanceled);
     return Scaffold(
       appBar: AppBar(
-        title: Text("New Icon"),
+        title: Text("Создание нового виджета"),
         leading: IconButton(
           icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -259,10 +269,10 @@ class _NewIconScreenState extends State<NewIconScreen> {
         return;
       }
       () async {
-        if (widget.widgetId == null) {
+        if (_widgetId == null) {
           saveNewWidgetData(_name, textColor, 0, _image!).then((value) => _createAddWidget(_name, _image ?? ""));
         } else {
-          saveWidgetData(widget.widgetId!, _name, textColor, 0, _image!).then((value) => _setActivityResult());
+          saveWidgetData(_widgetId!, _name, textColor, 0, _image!).then((value) => _setActivityResult());
         }
       }();
     } else {
@@ -271,10 +281,10 @@ class _NewIconScreenState extends State<NewIconScreen> {
         return;
       }
       () async {
-        if (widget.widgetId == null) {
+        if (_widgetId == null) {
           saveNewWidgetData(_name, textColor, 1, _path).then((value) => _createAddWidget(_name, _image ?? ""));
         } else {
-          saveWidgetData(widget.widgetId!, _name, textColor, 1, _path).then((value) => _setActivityResult());
+          saveWidgetData(_widgetId!, _name, textColor, 1, _path).then((value) => _setActivityResult());
         }
       }();
     }
@@ -310,13 +320,13 @@ class _NewIconScreenState extends State<NewIconScreen> {
   }
 
   Future<void> _setActivityResult() async {
-    developer.log('created_${widget.widgetId}', name: 'WIDGET');
+    developer.log('created_${_widgetId}', name: 'WIDGET');
     HomeWidget.updateWidget(
       name: 'SimpleAppWidget',
       androidName: 'SimpleAppWidget',
       iOSName: 'SimpleAppWidget',
     );
-    await platform.invokeMethod('setConfigResult', {"id": widget.widgetId});
+    await platform.invokeMethod('setConfigResult', {"id": _widgetId});
     if (_isConfig) {
       SystemNavigator.pop();
     } else {

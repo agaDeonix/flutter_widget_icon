@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:widget_icon/ui/editWidget/edit_icon.dart';
+import 'package:widget_icon/ui/newWidget/new_icon.dart';
 
 class WidgetsListScreen extends StatefulWidget {
   @override
@@ -83,13 +85,13 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
   }
 
   void _addNew() {
-    Navigator.pushNamed(context, '/add_new').then((value) {
+    Navigator.pushNamed(context, '/add_new', arguments: NewIconArguments(null, false)).then((value) {
       setState(() {});
     });
   }
 
   void _editItem(String id) {
-    Navigator.pushNamed(context, '/edit', arguments: id).then((value) {
+    Navigator.pushNamed(context, '/edit', arguments: EditIconArguments(id, false)).then((value) {
       setState(() {});
     });
   }
@@ -115,14 +117,13 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text("Widgets list"),
+        title: Text("Виджеты"),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: _prefs == null && _isSupportAddWidget == null ? _initLoading() : (_ids.isEmpty ? _initEmpty() : _initList()),
       ),
-      floatingActionButton: _isSupportAddWidget == null || _isSupportAddWidget == false ? SizedBox() : FloatingActionButton(onPressed: _addNew, tooltip: 'Add new widget', child: Icon(Icons.add)), // This
     );
   }
 
