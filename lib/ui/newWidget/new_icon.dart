@@ -11,6 +11,8 @@ import 'package:receive_intent/receive_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 
+import 'package:widget_icon/utils/StringConstants.dart';
+
 class NewIconScreen extends StatefulWidget {
 
   const NewIconScreen({Key? key}) : super(key: key);
@@ -53,7 +55,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
     ReceiveIntent.setResult(kActivityResultCanceled);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Создание нового виджета"),
+        title: Text(Strings.ICON_NEW_TITLE),
         leading: IconButton(
           icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -86,7 +88,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
           children: <Widget>[
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Enter a icon name'),
+              decoration: InputDecoration(border: OutlineInputBorder(), hintText: Strings.ICON_NAME_HINT),
               onChanged: (value) {
                 setState(() {
                   _name = value;
@@ -166,7 +168,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 16), minimumSize: Size(double.infinity, 44)),
             onPressed: () => {_chooseImage()},
-            child: Text('Choose image'),
+            child: Text(Strings.ICON_IMAGE_CHOOSE),
           ),
         ),
         new LayoutBuilder(builder: (context, constraint) {
@@ -189,7 +191,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
       children: [
         TextField(
           controller: _linkController,
-          decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Enter URL'),
+          decoration: InputDecoration(border: OutlineInputBorder(), hintText: Strings.ICON_URL_HINT),
           onChanged: (value) {
             setState(() {
               _path = value;
@@ -215,7 +217,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('Pick a color!'),
+        title: const Text(Strings.ICON_IMAGE_CHOOSE_TITLE),
         content: SingleChildScrollView(
           child: ColorPicker(
             pickerColor: pickerColor,
@@ -245,7 +247,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
         ),
         actions: <Widget>[
           FlatButton(
-            child: const Text('Got it'),
+            child: const Text(Strings.ICON_IMAGE_CHOOSE_SELECT),
             onPressed: () {
               setState(() => currentColor = pickerColor);
               Navigator.of(context).pop();
@@ -259,13 +261,13 @@ class _NewIconScreenState extends State<NewIconScreen> {
   void _onComleteClicked() {
     FocusScope.of(context).unfocus();
     if (_name.isEmpty) {
-      _showError('Enter name');
+      _showError(Strings.ICON_ERROR_ENTER_NAME);
       return;
     }
     var textColor = '#${pickerColor.value.toRadixString(16)}';
     if (dropdownValue == "Image") {
       if (_image == null || _image!.isEmpty) {
-        _showError('Choose image');
+        _showError(Strings.ICON_ERROR_CHOOSE_IMAGE);
         return;
       }
       () async {
@@ -277,7 +279,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
       }();
     } else {
       if (_path.isEmpty) {
-        _showError('Enter URL');
+        _showError(Strings.ICON_ERROR_ENTER_URL);
         return;
       }
       () async {

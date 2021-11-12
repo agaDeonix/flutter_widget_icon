@@ -8,6 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:widget_icon/utils/StringConstants.dart';
 
 class EditIconScreen extends StatefulWidget {
 
@@ -60,13 +61,13 @@ class _EditIconScreenState extends State<EditIconScreen> {
   void _onComleteClicked() {
     FocusScope.of(context).unfocus();
     if (_name.isEmpty) {
-      _showError('Необходимо ввести имя');
+      _showError(Strings.ICON_ERROR_ENTER_NAME);
       return;
     }
     var textColor = '#${pickerColor.value.toRadixString(16)}';
     if (dropdownValue == "Image") {
       if (_image == null || _image!.isEmpty) {
-        _showError('Выберите изображение');
+        _showError(Strings.ICON_ERROR_CHOOSE_IMAGE);
         return;
       }
       () async {
@@ -85,7 +86,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
       }();
     } else {
       if (_path == null || _path!.isEmpty) {
-        _showError('Enter URL');
+        _showError(Strings.ICON_ERROR_ENTER_URL);
         return;
       }
       () async {
@@ -125,17 +126,13 @@ class _EditIconScreenState extends State<EditIconScreen> {
     showDialog<bool>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-              title: const Text('Удаление'),
-              content: const Text('Удалить виджет можно только вручную с рабочего стола, найдите виджет на рабочем столе и удалите его вручную.'),
+              title: const Text(Strings.ICON_DELETE_TITLE),
+              content: const Text(Strings.ICON_DELETE_MESSAGE),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Хорошо'),
+                  child: const Text(Strings.ICON_DELETE_OK),
                 ),
-                // TextButton(
-                //   onPressed: () => _remove(),
-                //   child: const Text('Yes'),
-                // ),
               ],
             )).then((value) {
       if (value ?? false) {
@@ -197,7 +194,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text("Редактирование виджета"),
+        title: Text(Strings.ICON_EDIT_TITLE),
         leading: IconButton(
           icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -241,24 +238,10 @@ class _EditIconScreenState extends State<EditIconScreen> {
         child: _prefs == null
             ? _initLoading()
             : Column(
-                // Column is also a layout widget. It takes a list of children and
-                // arranges them vertically. By default, it sizes itself to fit its
-                // children horizontally, and tries to be as tall as its parent.
-                //
-                // Invoke "debug painting" (press "p" in the console, choose the
-                // "Toggle Debug Paint" action from the Flutter Inspector in Android
-                // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-                // to see the wireframe for each widget.
-                //
-                // Column has various properties to control how it sizes itself and
-                // how it positions its children. Here we use mainAxisAlignment to
-                // center the children vertically; the main axis here is the vertical
-                // axis because Columns are vertical (the cross axis would be
-                // horizontal).
                 children: <Widget>[
                   TextField(
                     controller: _nameController,
-                    decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Введите имя виджета'),
+                    decoration: InputDecoration(border: OutlineInputBorder(), hintText: Strings.ICON_NAME_HINT),
                     onChanged: (value) {
                       setState(() {
                         _name = value;
@@ -288,7 +271,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 16), minimumSize: Size(double.infinity, 44)),
                               onPressed: () => {_pickColor()},
-                              child: Text('Цвет надписи в виджете'),
+                              child: Text(Strings.ICON_COLOR_TITLE),
                             ),
                           ),
                         ),
@@ -323,20 +306,6 @@ class _EditIconScreenState extends State<EditIconScreen> {
 
   Widget _initLoading() {
     return Column(
-      // Column is also a layout widget. It takes a list of children and
-      // arranges them vertically. By default, it sizes itself to fit its
-      // children horizontally, and tries to be as tall as its parent.
-      //
-      // Invoke "debug painting" (press "p" in the console, choose the
-      // "Toggle Debug Paint" action from the Flutter Inspector in Android
-      // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-      // to see the wireframe for each widget.
-      //
-      // Column has various properties to control how it sizes itself and
-      // how it positions its children. Here we use mainAxisAlignment to
-      // center the children vertically; the main axis here is the vertical
-      // axis because Columns are vertical (the cross axis would be
-      // horizontal).
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         SizedBox(
@@ -368,7 +337,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 16), minimumSize: Size(double.infinity, 44)),
             onPressed: () => {_chooseImage()},
-            child: Text('Выберите изображение'),
+            child: Text(Strings.ICON_IMAGE_CHOOSE),
           ),
         ),
         new LayoutBuilder(builder: (context, constraint) {
@@ -391,7 +360,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
       children: [
         TextField(
           controller: _linkController,
-          decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Enter URL'),
+          decoration: InputDecoration(border: OutlineInputBorder(), hintText: Strings.ICON_URL_HINT),
           onChanged: (value) {
             setState(() {
               _path = value;
@@ -410,7 +379,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('Выберите цвет'),
+        title: const Text(Strings.ICON_IMAGE_CHOOSE_TITLE),
         content: SingleChildScrollView(
           child: ColorPicker(
             pickerColor: pickerColor,
@@ -440,7 +409,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
         ),
         actions: <Widget>[
           FlatButton(
-            child: const Text('Выбрать'),
+            child: const Text(Strings.ICON_IMAGE_CHOOSE_SELECT),
             onPressed: () {
               setState(() => currentColor = pickerColor);
               Navigator.of(context).pop();
