@@ -195,6 +195,8 @@ class _EditIconScreenState extends State<EditIconScreen> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(Strings.ICON_EDIT_TITLE),
+        backgroundColor: const Color(0xFFE6DFF1),
+        elevation: 0,
         leading: IconButton(
           icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.white),
           onPressed: () {

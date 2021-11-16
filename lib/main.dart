@@ -7,6 +7,8 @@ import 'package:widget_icon/ui/newWidget/new_icon.dart';
 import 'package:widget_icon/ui/splash/splash.dart';
 import 'package:widget_icon/ui/widgets_list/widgets_list.dart';
 
+import 'utils/Utils.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -30,8 +32,15 @@ class _MyAppState extends State<MyApp> {
         '/edit': (context) => EditIconScreen(),
       },
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Utils.createMaterialColor(Color(0xFF8B56DD)),
+        scaffoldBackgroundColor: const Color(0xFFE6DFF1),
+        primaryTextTheme: TextTheme(
+          headline6: TextStyle(
+            color: Colors.black
+          )
+        )
       ),
     );
   }
+
 }

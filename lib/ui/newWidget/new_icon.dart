@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -9,12 +10,9 @@ import 'package:home_widget/home_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:receive_intent/receive_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:developer' as developer;
-
 import 'package:widget_icon/utils/StringConstants.dart';
 
 class NewIconScreen extends StatefulWidget {
-
   const NewIconScreen({Key? key}) : super(key: key);
 
   @override
@@ -26,7 +24,6 @@ class NewIconArguments {
   bool isConfig;
 
   NewIconArguments(this.widgetId, this.isConfig);
-  
 }
 
 class _NewIconScreenState extends State<NewIconScreen> {
@@ -56,6 +53,8 @@ class _NewIconScreenState extends State<NewIconScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(Strings.ICON_NEW_TITLE),
+        backgroundColor: const Color(0xFFE6DFF1),
+        elevation: 0,
         leading: IconButton(
           icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.white),
           onPressed: () {

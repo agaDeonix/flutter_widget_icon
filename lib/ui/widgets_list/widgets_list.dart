@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,8 @@ import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:widget_icon/ui/editWidget/edit_icon.dart';
 import 'package:widget_icon/ui/newWidget/new_icon.dart';
+import 'package:widget_icon/utils/StringConstants.dart';
+import 'package:widget_icon/utils/Utils.dart';
 
 class WidgetsListScreen extends StatefulWidget {
   @override
@@ -118,6 +121,8 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text("Виджеты"),
+        backgroundColor: const Color(0xFFE6DFF1),
+        elevation: 0,
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -151,7 +156,7 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
           child: CircularProgressIndicator(
             strokeWidth: 5,
             backgroundColor: Colors.white,
-            valueColor: new AlwaysStoppedAnimation<Color>(Colors.blue),
+            valueColor: new AlwaysStoppedAnimation<Color>(Utils.createMaterialColor(Color(0xFF8B56DD))),
           ),
         ),
       ],
@@ -159,28 +164,25 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
   }
 
   Widget _initEmpty() {
-    return Column(
-      // Column is also a layout widget. It takes a list of children and
-      // arranges them vertically. By default, it sizes itself to fit its
-      // children horizontally, and tries to be as tall as its parent.
-      //
-      // Invoke "debug painting" (press "p" in the console, choose the
-      // "Toggle Debug Paint" action from the Flutter Inspector in Android
-      // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-      // to see the wireframe for each widget.
-      //
-      // Column has various properties to control how it sizes itself and
-      // how it positions its children. Here we use mainAxisAlignment to
-      // center the children vertically; the main axis here is the vertical
-      // axis because Columns are vertical (the cross axis would be
-      // horizontal).
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text(
-          'You haven\'t added icons,\npush on "+" button for adding new Icon',
-          textAlign: TextAlign.center,
+    return Container(
+      decoration: BoxDecoration(
+          image: DecorationImage(
+        image: AssetImage("assets/images/ic_empty_help.png"),
+        fit: BoxFit.scaleDown,
+      )),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Align(alignment: Alignment.centerLeft, child: Text(Strings.EMPTY_TITLE, textAlign: TextAlign.left, style: const TextStyle(color: Colors.black54, fontSize: 18, fontWeight: FontWeight.bold))),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Text(Strings.EMPTY_MESSAGE, textAlign: TextAlign.left, style: const TextStyle(color: Colors.black54, fontSize: 18)),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
