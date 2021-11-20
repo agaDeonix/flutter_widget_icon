@@ -199,24 +199,26 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
     var name = _widgets["name_$id"]!;
     var path = _widgets["path_$id"]!;
     var type = int.parse(_widgets["type_$id"]!);
-    var typeText = "Image";
+    var typeText = Strings.ITEM_TYPE_IMAGE;
     if (type == 1) {
-      typeText = "Link";
+      typeText = Strings.ITEM_TYPE_LINK;
     }
     return GestureDetector(
       onTap: () => _editItem(id),
       child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         margin: EdgeInsets.fromLTRB(10, isFirst ? 10 : 5, 10, isLast ? 10 : 5),
-        elevation: 4,
+        elevation: 10,
+        shadowColor: Color(0x80000000),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(15.0),
           child: Row(
             children: [
               getImageByType(type, path),
               Expanded(
                 flex: 1,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+                  padding: const EdgeInsets.only(left: 10.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -225,17 +227,20 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(
-                        height: 15,
+                        height: 12,
                       ),
-                      Text("type: $typeText"),
+                      Text(
+                        "${Strings.ITEM_TYPE}: $typeText",
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                      ),
                     ],
                   ),
                 ),
               ),
               Icon(
                 Icons.chevron_right,
-                color: Colors.black38,
-                size: 25.0,
+                color: Color(0xff8B56DD),
+                size: 35.0,
               )
             ],
           ),

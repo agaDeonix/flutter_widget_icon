@@ -56,7 +56,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
         backgroundColor: const Color(0xFFE6DFF1),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.white),
+          icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.black),
           onPressed: () {
             if (_isConfig) {
               SystemNavigator.pop();
@@ -74,7 +74,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
               },
               child: Icon(
                 Icons.check,
-                size: 26,
+                size: 26, color: Colors.black
               ),
             ),
           ),

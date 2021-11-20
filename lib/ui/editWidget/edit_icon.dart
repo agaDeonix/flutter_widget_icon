@@ -3,15 +3,12 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:widget_icon/utils/StringConstants.dart';
 
 class EditIconScreen extends StatefulWidget {
-
   const EditIconScreen({Key? key}) : super(key: key);
 
   @override
@@ -29,16 +26,20 @@ class _EditIconScreenState extends State<EditIconScreen> {
   bool _isConfig = false;
   String _id = "";
   String _name = "";
+  String? _nameError;
   String? _path;
+  String? _pathError;
   String? _image;
+  String? _imageError;
   var _nameController = TextEditingController(text: '');
   var _linkController = TextEditingController(text: '');
   final ImagePicker _picker = ImagePicker();
   SharedPreferences? _prefs;
 
+  static List<Color> colors = [Colors.black, Colors.white, Colors.grey, Colors.blue, Colors.deepOrange, Colors.lightGreen];
+
   // create some values
-  Color pickerColor = Colors.black;
-  Color currentColor = Colors.black;
+  Color pickerColor = colors.first;
 
   String dropdownValue = 'Image';
 
@@ -55,19 +56,22 @@ class _EditIconScreenState extends State<EditIconScreen> {
     var image = await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
       _image = image!.path;
+      _imageError = null;
     });
   }
 
   void _onComleteClicked() {
     FocusScope.of(context).unfocus();
     if (_name.isEmpty) {
-      _showError(Strings.ICON_ERROR_ENTER_NAME);
+      setState(() {
+        _nameError = Strings.ICON_ERROR_ENTER_NAME;
+      });
       return;
     }
     var textColor = '#${pickerColor.value.toRadixString(16)}';
     if (dropdownValue == "Image") {
       if (_image == null || _image!.isEmpty) {
-        _showError(Strings.ICON_ERROR_CHOOSE_IMAGE);
+        _imageError = Strings.ICON_ERROR_CHOOSE_IMAGE;
         return;
       }
       () async {
@@ -86,7 +90,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
       }();
     } else {
       if (_path == null || _path!.isEmpty) {
-        _showError(Strings.ICON_ERROR_ENTER_URL);
+        _pathError = Strings.ICON_ERROR_ENTER_URL;
         return;
       }
       () async {
@@ -162,11 +166,15 @@ class _EditIconScreenState extends State<EditIconScreen> {
     }();
   }
 
-  Color fromHex(String hexString) {
-    final buffer = StringBuffer();
-    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
-    buffer.write(hexString.replaceFirst('#', ''));
-    return Color(int.parse(buffer.toString(), radix: 16));
+  Color? fromHex(String? hexString) {
+    if (hexString != null) {
+      final buffer = StringBuffer();
+      if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+      buffer.write(hexString.replaceFirst('#', ''));
+      return Color(int.parse(buffer.toString(), radix: 16));
+    } else {
+      return null;
+    }
   }
 
   @override
@@ -183,8 +191,9 @@ class _EditIconScreenState extends State<EditIconScreen> {
       } else {
         _path = _prefs!.getString("path_$_id") ?? "";
       }
-      currentColor = fromHex(_prefs!.getString("text_color_$_id") ?? "#ffffffff");
-      pickerColor = currentColor;
+      // currentColor = fromHex(_prefs!.getString("text_color_$_id") ?? "#ffffffff");
+      // pickerColor = currentColor;
+      pickerColor = fromHex(_prefs!.getString("text_color_$_id")) ?? colors.first;
       _nameController = TextEditingController(text: _name);
       _linkController = TextEditingController(text: _path);
       setState(() {});
@@ -198,7 +207,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
         backgroundColor: const Color(0xFFE6DFF1),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.white),
+          icon: Icon(_isConfig ? Icons.close_rounded : Icons.arrow_back, color: Colors.black),
           onPressed: () {
             if (_isConfig) {
               SystemNavigator.pop();
@@ -214,10 +223,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
               onTap: () {
                 _onRemoveClicked();
               },
-              child: Icon(
-                Icons.delete_forever_outlined,
-                size: 26,
-              ),
+              child: Icon(Icons.delete_forever_outlined, size: 26, color: Colors.black),
             ),
           ),
           Padding(
@@ -226,10 +232,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
               onTap: () {
                 _onComleteClicked();
               },
-              child: Icon(
-                Icons.check,
-                size: 26,
-              ),
+              child: Icon(Icons.check, size: 26, color: Colors.black),
             ),
           ),
         ],
@@ -243,49 +246,71 @@ class _EditIconScreenState extends State<EditIconScreen> {
                 children: <Widget>[
                   TextField(
                     controller: _nameController,
-                    decoration: InputDecoration(border: OutlineInputBorder(), hintText: Strings.ICON_NAME_HINT),
+                    decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.only(left: 14.0, bottom: 8.0, top: 8.0),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        hintText: Strings.ICON_NAME_HINT,
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.red),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        errorText: _nameError),
                     onChanged: (value) {
                       setState(() {
                         _name = value;
+                        _nameError = null;
                       });
                     },
                   ),
+                  SizedBox(
+                    height: 25,
+                  ),
+                  Align(alignment: Alignment.centerLeft, child: Text(Strings.ICON_CHOOSE_COLOR, style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w500))),
                   Padding(
-                    padding: const EdgeInsets.only(top: 15),
+                    padding: const EdgeInsets.only(top: 10, bottom: 25),
                     child: Row(
-                      children: [
-                        Container(
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Container(
-                              height: 42,
-                              width: 42,
-                              color: pickerColor,
-                            ),
-                          ),
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(color: Colors.black),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 15),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 16), minimumSize: Size(double.infinity, 44)),
-                              onPressed: () => {_pickColor()},
-                              child: Text(Strings.ICON_COLOR_TITLE),
-                            ),
-                          ),
-                        ),
-                      ],
+                      children: _initColors(),
                     ),
                   ),
+                  Align(alignment: Alignment.centerLeft, child: Text(Strings.ICON_TYPE_WIDGET, style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w500))),
                   Padding(
-                    padding: const EdgeInsets.only(top: 0.0),
-                    child: new DropdownButton<String>(
+                    padding: const EdgeInsets.only(top: 10.0, bottom: 15),
+                    child: new DropdownButtonFormField(
                       isExpanded: true,
                       value: dropdownValue,
-                      style: const TextStyle(color: Colors.black, fontSize: 16),
+                      elevation: 10,
+                      iconEnabledColor: Color(0xff8B56DD),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.only(left: 14.0, bottom: 8.0, top: 8.0, right: 14),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        hintText: Strings.ICON_NAME_HINT,
+                      ),
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                      ),
                       onChanged: (String? newValue) {
                         setState(() {
                           dropdownValue = newValue!;
@@ -294,7 +319,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
                       items: <String>['Image', 'Link'].map((String value) {
                         return new DropdownMenuItem<String>(
                           value: value,
-                          child: new Text(value),
+                          child: new Text(value == "Image" ? Strings.ITEM_TYPE_IMAGE : Strings.ITEM_TYPE_LINK),
                         );
                       }).toList(),
                     ),
@@ -334,25 +359,35 @@ class _EditIconScreenState extends State<EditIconScreen> {
   Widget initPhoto() {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 15, bottom: 15),
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 16), minimumSize: Size(double.infinity, 44)),
-            onPressed: () => {_chooseImage()},
-            child: Text(Strings.ICON_IMAGE_CHOOSE),
-          ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 16), minimumSize: Size(double.infinity, 44), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+          onPressed: () => {_chooseImage()},
+          child: Text(Strings.ICON_IMAGE_CHOOSE),
         ),
-        new LayoutBuilder(builder: (context, constraint) {
-          return _image == null
-              ? SvgPicture.asset(
-                  "assets/images/ic_placeholder.svg",
-                  width: constraint.biggest.width,
-                )
-              : Image.file(
+        if (_imageError != null)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20, top: 10),
+              child: Text(
+                _imageError!,
+                style: TextStyle(color: Color(0xffd50000), fontSize: 12),
+              ),
+            ),
+          ),
+        if (_image != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 15.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: new LayoutBuilder(builder: (context, constraint) {
+                return Image.file(
                   File(_image!),
                   width: constraint.biggest.width,
                 );
-        }),
+              }),
+            ),
+          ),
       ],
     );
   }
@@ -362,10 +397,32 @@ class _EditIconScreenState extends State<EditIconScreen> {
       children: [
         TextField(
           controller: _linkController,
-          decoration: InputDecoration(border: OutlineInputBorder(), hintText: Strings.ICON_URL_HINT),
+          decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.only(left: 14.0, bottom: 8.0, top: 8.0),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              hintText: Strings.ICON_URL_HINT,
+              errorText: _pathError),
           onChanged: (value) {
             setState(() {
               _path = value;
+              _pathError = null;
             });
           },
         ),
@@ -377,48 +434,50 @@ class _EditIconScreenState extends State<EditIconScreen> {
     setState(() => pickerColor = color);
   }
 
-  void _pickColor() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text(Strings.ICON_IMAGE_CHOOSE_TITLE),
-        content: SingleChildScrollView(
-          child: ColorPicker(
-            pickerColor: pickerColor,
-            onColorChanged: changeColor,
-            showLabel: true,
-            pickerAreaHeightPercent: 0.8,
+  List<Widget> _initColors() {
+    List<Widget> result = [];
+    colors.forEach((element) {
+      result.add(GestureDetector(
+        onTap: () {
+          setState(() {
+            pickerColor = element;
+          });
+        },
+        child: Container(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(pickerColor.value == element.value ? 8 : 10),
+            child: Align(
+              alignment: Alignment.center,
+              child: Container(
+                height: 50,
+                width: 50,
+                color: element,
+              ),
+            ),
           ),
-          // Use Material color picker:
-          //
-          // child: MaterialPicker(
-          //   pickerColor: pickerColor,
-          //   onColorChanged: changeColor,
-          //   showLabel: true, // only on portrait mode
-          // ),
-          //
-          // Use Block color picker:
-          //
-          // child: BlockPicker(
-          //   pickerColor: currentColor,
-          //   onColorChanged: changeColor,
-          // ),
-          //
-          // child: MultipleChoiceBlockPicker(
-          //   pickerColors: currentColors,
-          //   onColorsChanged: changeColors,
-          // ),
+          width: 50,
+          height: 50,
+          decoration: pickerColor.value == element.value
+              ? BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    width: 3,
+                    color: Color(0xff8B56DD),
+                  ))
+              : null,
         ),
-        actions: <Widget>[
-          FlatButton(
-            child: const Text(Strings.ICON_IMAGE_CHOOSE_SELECT),
-            onPressed: () {
-              setState(() => currentColor = pickerColor);
-              Navigator.of(context).pop();
-            },
+      ));
+      if (colors.last != element) {
+        result.add(
+          Expanded(
+            child: SizedBox(
+              width: 1,
+            ),
           ),
-        ],
-      ),
-    );
+        );
+      }
+    });
+
+    return result;
   }
 }
