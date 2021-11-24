@@ -10,13 +10,13 @@ class Strings {
 
   static const ICON_EDIT_TITLE = "Редактирование виджета";
 
-  static const ICON_NAME_HINT = 'Введите имя виджета';
+  static const ICON_NAME_HINT = 'Имя виджета';
 
   static const ICON_COLOR_TITLE = 'Цвет надписи в виджете';
 
   static const ICON_IMAGE_CHOOSE = 'Выберите изображение';
 
-  static const ICON_URL_HINT = 'Введите адрес ссылки';
+  static const ICON_URL_HINT = 'URL адрес';
 
   static const ICON_IMAGE_CHOOSE_TITLE = 'Выберите цвет';
 
