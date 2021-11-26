@@ -6,7 +6,7 @@
     android:initialLayout="@layout/simple_app_widget"
     android:minHeight="54dp"
     android:minWidth="54dp"
-    android:previewImage="@drawable/ic_showrtcut"
+    android:previewImage="@drawable/ic_widget_placeholder"
     android:updatePeriodMillis="0"
     android:widgetFeatures="reconfigurable"
     android:widgetCategory="home_screen">

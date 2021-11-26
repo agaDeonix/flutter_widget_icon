@@ -13,6 +13,7 @@ import 'dart:developer' as developer;
 
 import 'package:widget_icon/ui/editWidget/edit_icon.dart';
 import 'package:widget_icon/ui/newWidget/new_icon.dart';
+import 'package:widget_icon/utils/StringConstants.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -39,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Image.asset("assets/images/ic_splash.png", width: 150, height: 150, fit: BoxFit.cover),
-              Text("ICON WIDGET", style: const TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold )),
+              Text(Strings.APP_NAME, style: const TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold )),
             ],
           ),
         ],

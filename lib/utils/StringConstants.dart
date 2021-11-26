@@ -1,5 +1,6 @@
 
 class Strings {
+  static const APP_NAME = 'HOME SHORTCUTS';
   static const ICON_ERROR_ENTER_NAME = 'Необходимо ввести имя';
   static const ICON_ERROR_CHOOSE_IMAGE = 'Необходимо выбрать изображение';
   static const ICON_ERROR_ENTER_URL = 'Необходимо ввести адрес ссылки';

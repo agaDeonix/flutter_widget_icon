@@ -18,6 +18,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.RemoteViews
+import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileInputStream
@@ -74,9 +75,10 @@ class SimpleAppWidget : AppWidgetProvider() {
             val file = File(path)
             val pathFile = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) FileProvider.getUriForFile(context, context.packageName.toString() + ".provider", file) else Uri.fromFile(file)
             val intent = Intent(Intent.ACTION_VIEW)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             intent.setDataAndType(pathFile, "image/*")
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            PendingIntent.getActivity(context, 0, intent, android.app.PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.getActivity(context, 0, intent, 0)
         } else {
             var newPath = path
             if (!path.startsWith("http://") && !path.startsWith("https://")) {
