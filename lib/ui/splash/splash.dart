@@ -13,6 +13,7 @@ import 'dart:developer' as developer;
 
 import 'package:widget_icon/ui/editWidget/edit_icon.dart';
 import 'package:widget_icon/ui/newWidget/new_icon.dart';
+import 'package:widget_icon/utils/Constants.dart';
 import 'package:widget_icon/utils/StringConstants.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -40,7 +41,8 @@ class _SplashScreenState extends State<SplashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Image.asset("assets/images/ic_splash.png", width: 150, height: 150, fit: BoxFit.cover),
-              Text(Strings.APP_NAME, style: const TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold )),
+              Text(Strings.APP_NAME_FIRST, style: const TextStyle(color: Colors.black, fontSize: 50, fontWeight: FontWeight.bold )),
+              Text(Strings.APP_NAME_SECOND, style: const TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold )),
             ],
           ),
         ],
@@ -67,7 +69,8 @@ class _SplashScreenState extends State<SplashScreen> {
         }
       }
     } on PlatformException {}
-
+    var prefs = await SharedPreferences.getInstance();
+    var isOnboardingShown = prefs.getBool(Constants.IS_ONBOARDING_SHOWN) ?? false;
     await Future.delayed(Duration(seconds: 1));
     setState(() {
         if (isNewValue) {
@@ -75,7 +78,11 @@ class _SplashScreenState extends State<SplashScreen> {
         } else if (isEditValue) {
           Navigator.pushReplacementNamed(context, "/edit", arguments: EditIconArguments(widgetId, true));
         } else {
-          Navigator.pushReplacementNamed(context, "/list");
+          if(!isOnboardingShown) {
+            Navigator.pushReplacementNamed(context, "/onboarding");
+          } else {
+            Navigator.pushReplacementNamed(context, "/list");
+          }
         }
     });
   }

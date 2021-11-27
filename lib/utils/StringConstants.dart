@@ -1,6 +1,7 @@
 
 class Strings {
-  static const APP_NAME = 'HOME SHORTCUTS';
+  static const APP_NAME_FIRST = 'HOME';
+  static const APP_NAME_SECOND = 'SHORTCUTS';
   static const ICON_ERROR_ENTER_NAME = 'Необходимо ввести имя';
   static const ICON_ERROR_CHOOSE_IMAGE = 'Необходимо выбрать изображение';
   static const ICON_ERROR_ENTER_URL = 'Необходимо ввести адрес ссылки';
@@ -34,5 +35,11 @@ class Strings {
 
   static const String ICON_CHOOSE_COLOR = "Цвет текста";
   static const String ICON_TYPE_WIDGET = "Тип виджета";
+
+  static const String ONBOARDING_FIRST_TITLE = "Сделай скриншот\nили сохрани\nизображение в\nГалерею";
+  static const String ONBOARDING_SECOND_TITLE = "добавь наш виджет\nна рабочий экран\nи\nвыбери нужное\nизображение";
+  static const String ONBOARDING_THIRD_TITLE = "ГОТОВО!\n\nвыбранное\nизображение доступно\nв любое время\nбез интернета и долгих\nзагрузок";
+  static const String ONBOARDING_NEXT = "Продолжить";
+  static const String ONBOARDING_CLOSE = "ЗАКОНЧИТЬ";
 
 }
