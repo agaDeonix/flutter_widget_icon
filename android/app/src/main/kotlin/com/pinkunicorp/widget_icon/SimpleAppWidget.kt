@@ -224,5 +224,10 @@ class SimpleAppWidget : AppWidgetProvider() {
             callbackIntent.putExtras(bundle)
             return PendingIntent.getBroadcast(context, BROADCAST_ID, callbackIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
+
+        fun getPendingIntent(context: Context): PendingIntent {
+            val callbackIntent = Intent(context, SimpleAppWidget::class.java)
+            return PendingIntent.getBroadcast(context, BROADCAST_ID, callbackIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
     }
 }

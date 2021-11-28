@@ -47,22 +47,6 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
 
   static const platform = MethodChannel('samples.flutter.dev/widgets');
 
-  bool? _isSupportAddWidget = null;
-
-  Future<void> _getIsSupportAddWidget() async {
-    bool isSupportAddWidget;
-    try {
-      final bool result = await platform.invokeMethod('isSupportAddWidget');
-      isSupportAddWidget = result;
-    } on PlatformException catch (e) {
-      isSupportAddWidget = false;
-    }
-
-    setState(() {
-      _isSupportAddWidget = isSupportAddWidget;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -70,7 +54,6 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
       _prefs = await SharedPreferences.getInstance();
       setState(() {});
     }();
-    _getIsSupportAddWidget();
     SystemChannels.lifecycle.setMessageHandler((msg) async {
       debugPrint('SystemChannels> $msg');
       if (msg == AppLifecycleState.resumed.toString() && _prefs != null) {
@@ -88,13 +71,17 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
   }
 
   void _addNew() {
-    Navigator.pushNamed(context, '/add_new', arguments: NewIconArguments(null, false)).then((value) {
+    Navigator.pushNamed(context, '/add_new',
+            arguments: NewIconArguments(null, false))
+        .then((value) {
       setState(() {});
     });
   }
 
   void _editItem(String id) {
-    Navigator.pushNamed(context, '/edit', arguments: EditIconArguments(id, false)).then((value) {
+    Navigator.pushNamed(context, '/edit',
+            arguments: EditIconArguments(id, false))
+        .then((value) {
       setState(() {});
     });
   }
@@ -102,7 +89,12 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
   @override
   Widget build(BuildContext context) {
     if (_prefs != null) {
-      _ids = _prefs!.getString("list_ids")?.split(",").where((element) => element.isNotEmpty).toList() ?? List.empty();
+      _ids = _prefs!
+              .getString("list_ids")
+              ?.split(",")
+              .where((element) => element.isNotEmpty)
+              .toList() ??
+          List.empty();
       for (var id in _ids) {
         _widgets["name_$id"] = _prefs!.getString("name_$id") ?? "";
         _widgets["path_$id"] = _prefs!.getString("path_$id") ?? "";
@@ -127,8 +119,14 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: _prefs == null && _isSupportAddWidget == null ? _initLoading() : (_ids.isEmpty ? _initEmpty() : _initList()),
+        child: _prefs == null
+            ? _initLoading()
+            : (_ids.isEmpty ? _initEmpty() : _initList()),
       ),
+      floatingActionButton:
+          _prefs != null && _ids.isNotEmpty
+              ? initFloatingActionButton()
+              : null,
     );
   }
 
@@ -156,7 +154,8 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
           child: CircularProgressIndicator(
             strokeWidth: 5,
             backgroundColor: Colors.white,
-            valueColor: new AlwaysStoppedAnimation<Color>(Utils.createMaterialColor(Color(0xFF8B56DD))),
+            valueColor: new AlwaysStoppedAnimation<Color>(
+                Utils.createMaterialColor(Color(0xFF8B56DD))),
           ),
         ),
       ],
@@ -175,10 +174,19 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Align(alignment: Alignment.centerLeft, child: Text(Strings.EMPTY_TITLE, textAlign: TextAlign.left, style: const TextStyle(color: Colors.black54, fontSize: 18, fontWeight: FontWeight.bold))),
+            Align(
+                alignment: Alignment.centerLeft,
+                child: Text(Strings.EMPTY_TITLE,
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                        color: Colors.black54,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold))),
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
-              child: Text(Strings.EMPTY_MESSAGE, textAlign: TextAlign.left, style: const TextStyle(color: Colors.black54, fontSize: 18)),
+              child: Text(Strings.EMPTY_MESSAGE,
+                  textAlign: TextAlign.left,
+                  style: const TextStyle(color: Colors.black54, fontSize: 18)),
             ),
           ],
         ),
@@ -224,14 +232,16 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
                     children: [
                       Text(
                         name,
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(
                         height: 12,
                       ),
                       Text(
                         "${Strings.ITEM_TYPE}: $typeText",
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -253,7 +263,34 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
     if (type == 0) {
       return Image.file(File(path), width: 50, height: 50, fit: BoxFit.cover);
     } else {
-      return Image.asset("assets/images/ic_url.png", width: 50, height: 50, fit: BoxFit.cover);
+      return Image.asset("assets/images/ic_url.png",
+          width: 50, height: 50, fit: BoxFit.cover);
     }
+  }
+
+  Widget initFloatingActionButton() {
+    return FloatingActionButton.extended(
+      label: const Text(Strings.LIST_ADD_WIDGET),
+      icon: const Icon(Icons.add),
+      backgroundColor: Color(0xff8B56DD),
+      onPressed: () {
+        _showHowAddHomeScreenWidget();
+      },
+    );
+  }
+
+  void _showHowAddHomeScreenWidget() {
+    showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text(Strings.LIST_HOW_ADD_WIDGET_TITLE),
+          content: const Text(Strings.EMPTY_MESSAGE),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text(Strings.LIST_HOW_ADD_WIDGET_OK, style: TextStyle(fontSize: 20),),
+            ),
+          ],
+        )).then((value) {});
   }
 }

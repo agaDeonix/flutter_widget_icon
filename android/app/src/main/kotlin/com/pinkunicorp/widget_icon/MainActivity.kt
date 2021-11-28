@@ -28,7 +28,8 @@ class MainActivity : FlutterActivity() {
                 }
                 "createWidget" -> {
                     resultAddWidget = result
-                    createWidget(call.argument("name") ?: "", call.argument("textColor") ?: "#ffffffff", call.argument("type") ?: 0, call.argument("path") ?: "")
+//                    createWidget(call.argument("name") ?: "", call.argument("textColor") ?: "#ffffffff", call.argument("type") ?: 0, call.argument("path") ?: "")
+                    createWidget()
                 }
                 "setConfigResult" -> {
                     setConfigResult(call.argument("id") ?: "-1")
@@ -59,6 +60,14 @@ class MainActivity : FlutterActivity() {
 
                 mAppWidgetManager.requestPinAppWidget(myProvider, bundle, SimpleAppWidget.getPendingIntent(this, name, textColor, type, path))
             }
+        }
+    }
+
+    private fun createWidget() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val mAppWidgetManager = getSystemService(AppWidgetManager::class.java)
+            val myProvider = ComponentName(this, SimpleAppWidget::class.java)
+            mAppWidgetManager.requestPinAppWidget(myProvider, null, SimpleAppWidget.getPendingIntent(this))
         }
     }
 

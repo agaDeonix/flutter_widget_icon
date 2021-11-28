@@ -28,6 +28,7 @@ class Strings {
 
   static const String EMPTY_TITLE = "Как добавить виджет";
   static const String EMPTY_MESSAGE = "1. Коснитесь свободного участка на главном экране и удерживайте его или сведите два пальца.\n\n2. Коснитесь значка \"Виджеты\".\n\n3. Найдите <наше приложение по иконке>, нажмите на виджет и удерживайте его. Появятся изображения главных экранов.\n\n4. Перетащите виджет в нужное место и отпустите.";
+  static const String EMPTY_MESSAGE_ADD_WIDGET = "5. Или нажмите кнопку \"Добавить виджет\" ниже.";
 
   static const String ITEM_TYPE = "Тип";
   static const String ITEM_TYPE_IMAGE = "Изображение";
@@ -41,5 +42,9 @@ class Strings {
   static const String ONBOARDING_THIRD_TITLE = "ГОТОВО!\n\nвыбранное\nизображение доступно\nв любое время\nбез интернета и долгих\nзагрузок";
   static const String ONBOARDING_NEXT = "Продолжить";
   static const String ONBOARDING_CLOSE = "ЗАКОНЧИТЬ";
+
+  static const String LIST_ADD_WIDGET = "ДОБАВИТЬ ВИДЖЕТ";
+  static const String LIST_HOW_ADD_WIDGET_TITLE = "Как добавить виджет";
+  static const String LIST_HOW_ADD_WIDGET_OK = "Хорошо";
 
 }
