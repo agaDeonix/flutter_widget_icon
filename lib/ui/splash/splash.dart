@@ -3,19 +3,14 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:home_widget/home_widget.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:receive_intent/receive_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:widget_icon/ui/editWidget/edit_icon.dart';
 import 'package:widget_icon/ui/newWidget/new_icon.dart';
 import 'package:widget_icon/utils/Constants.dart';
-import 'package:widget_icon/utils/StringConstants.dart';
-
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -41,8 +36,8 @@ class _SplashScreenState extends State<SplashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Image.asset("assets/images/ic_splash.png", width: 150, height: 150, fit: BoxFit.cover),
-              Text(Strings.APP_NAME_FIRST, style: const TextStyle(color: Colors.black, fontSize: 50, fontWeight: FontWeight.bold )),
-              Text(Strings.APP_NAME_SECOND, style: const TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold )),
+              Text('APP_NAME_FIRST'.tr(), style: const TextStyle(color: Colors.black, fontSize: 50, fontWeight: FontWeight.bold )),
+              Text('APP_NAME_SECOND'.tr(), style: const TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold )),
             ],
           ),
         ],

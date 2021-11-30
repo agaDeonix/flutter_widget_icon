@@ -1,9 +1,9 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:widget_icon/utils/Constants.dart';
-import 'package:widget_icon/utils/StringConstants.dart';
+
+import 'package:easy_localization/easy_localization.dart';
 
 class OnboardingScreen extends StatefulWidget {
   @override
@@ -60,7 +60,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, top: 60),
                 child: Text(
-                  Strings.ONBOARDING_FIRST_TITLE.toUpperCase(),
+                  'ONBOARDING_FIRST_TITLE'.tr().toUpperCase(),
                   style: const TextStyle(
                     color: Color(0xff8B56DD),
                     fontSize: 24,
@@ -89,7 +89,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text(Strings.ONBOARDING_NEXT.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold),),
+                    child: Text(
+                      'ONBOARDING_NEXT'.tr().toUpperCase(),
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ),
@@ -117,7 +120,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, top: 60),
                 child: Text(
-                  Strings.ONBOARDING_SECOND_TITLE.toUpperCase(),
+                  'ONBOARDING_SECOND_TITLE'.tr().toUpperCase(),
                   style: const TextStyle(
                     color: Color(0xff8B56DD),
                     fontSize: 24,
@@ -146,7 +149,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text(Strings.ONBOARDING_NEXT.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text('ONBOARDING_NEXT'.tr().toUpperCase(),
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
               ),
@@ -174,7 +178,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, top: 60),
                 child: Text(
-                  Strings.ONBOARDING_THIRD_TITLE.toUpperCase(),
+                  'ONBOARDING_THIRD_TITLE'.tr().toUpperCase(),
                   style: const TextStyle(
                     color: Color(0xff8B56DD),
                     fontSize: 24,
@@ -207,7 +211,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Text(Strings.ONBOARDING_CLOSE.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: Text('ONBOARDING_CLOSE'.tr().toUpperCase(),
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   )),
             ],

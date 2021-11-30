@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:receive_intent/receive_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:widget_icon/ui/base/icon_data.dart';
-import 'package:widget_icon/utils/StringConstants.dart';
+
+import 'package:easy_localization/easy_localization.dart';
 
 class NewIconScreen extends StatefulWidget {
   const NewIconScreen({Key? key}) : super(key: key);
@@ -49,7 +50,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
     ReceiveIntent.setResult(kActivityResultCanceled);
     return Scaffold(
       appBar: AppBar(
-        title: Text(Strings.ICON_NEW_TITLE),
+        title: Text('ICON_NEW_TITLE'.tr()),
         backgroundColor: const Color(0xFFE6DFF1),
         elevation: 0,
         leading: IconButton(

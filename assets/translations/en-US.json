@@ -1,0 +1,50 @@
+{
+  "APP_NAME_FIRST":"HOME",
+  "APP_NAME_SECOND":"SHORTCUTS",
+  "WIDGETS":"Widgets",
+
+  "ICON_ERROR_ENTER_NAME":"Enter name",
+  "ICON_ERROR_CHOOSE_IMAGE":"Choose image",
+  "ICON_ERROR_ENTER_URL":"Enter URL",
+
+  "ICON_DELETE_TITLE":"Deleting",
+  "ICON_DELETE_MESSAGE":"You can delete the widget only manually on Home Screen. Find it on Home Screen and delete it manually.",
+  "ICON_DELETE_OK":"Ok",
+
+  "ICON_EDIT_TITLE":"Edit",
+
+  "ICON_NAME_HINT":"Name of the widget",
+
+  "ICON_COLOR_TITLE":"Color of widget's title",
+
+  "ICON_IMAGE_CHOOSE":"Choose image",
+
+  "ICON_URL_HINT":"URL address",
+
+  "ICON_IMAGE_CHOOSE_TITLE":"Choose color",
+
+  "ICON_IMAGE_CHOOSE_SELECT":"Choose",
+
+  "ICON_NEW_TITLE":"New widget",
+
+  "EMPTY_TITLE":"How to add widget",
+  "EMPTY_MESSAGE":"1. On a Home screen, touch and hold an empty space or make pinch gesture.\n\n2. Tap \"Widgets\".\n\n3. Find our app \"Home shortcuts\" touch and hold a widget. You’ll get images of your Home screens.\n\n4. Slide the widget to where you want it. Lift your finger.",
+  "EMPTY_MESSAGE_ADD_WIDGET":"5. Or press a button \"Add widget\" below.",
+
+  "ITEM_TYPE":"Type: {}",
+  "ITEM_TYPE_IMAGE":"Image",
+  "ITEM_TYPE_LINK":"Link",
+
+  "ICON_CHOOSE_COLOR":"Text color",
+  "ICON_TYPE_WIDGET":"Type of widget",
+
+  "ONBOARDING_FIRST_TITLE":"Make a screenshot\nor save\n an image in\nGallery",
+  "ONBOARDING_SECOND_TITLE":"Add our widget\non Home Screen\nand\nchoose\nan image",
+  "ONBOARDING_THIRD_TITLE":"Congratuations!\n\nSelected\nimage in touch\nall time\nwithout internet and\nlong loading",
+  "ONBOARDING_NEXT":"Continue",
+  "ONBOARDING_CLOSE":"CLOSE",
+
+  "LIST_ADD_WIDGET":"ADD WIDGET",
+  "LIST_HOW_ADD_WIDGET_TITLE":"How to add widget",
+  "LIST_HOW_ADD_WIDGET_OK":"Ok"
+}

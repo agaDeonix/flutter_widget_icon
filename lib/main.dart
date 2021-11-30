@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:receive_intent/receive_intent.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:widget_icon/ui/editWidget/edit_icon.dart';
 import 'package:widget_icon/ui/newWidget/new_icon.dart';
 import 'package:widget_icon/ui/onboarding/onboarding.dart';
 import 'package:widget_icon/ui/splash/splash.dart';
 import 'package:widget_icon/ui/widgets_list/widgets_list.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import 'utils/Utils.dart';
 
-void main() {
-  runApp(MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
+  runApp(
+    EasyLocalization(
+        supportedLocales: [Locale('en', 'US'), Locale('ru', 'RU')],
+        path: 'assets/translations',
+        fallbackLocale: Locale('en', 'US'),
+        child: MyApp()),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -25,6 +32,9 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ICON WIDGET',
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       initialRoute: "/splash",
       routes: {
         '/splash': (context) => SplashScreen(),
@@ -34,15 +44,10 @@ class _MyAppState extends State<MyApp> {
         '/edit': (context) => EditIconScreen(),
       },
       theme: ThemeData(
-        primarySwatch: Utils.createMaterialColor(Color(0xFF8B56DD)),
-        scaffoldBackgroundColor: const Color(0xFFE6DFF1),
-        primaryTextTheme: TextTheme(
-          headline6: TextStyle(
-            color: Colors.black
-          )
-        )
-      ),
+          primarySwatch: Utils.createMaterialColor(Color(0xFF8B56DD)),
+          scaffoldBackgroundColor: const Color(0xFFE6DFF1),
+          primaryTextTheme:
+              TextTheme(headline6: TextStyle(color: Colors.black))),
     );
   }
-
 }

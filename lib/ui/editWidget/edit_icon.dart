@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:widget_icon/ui/base/icon_data.dart';
-import 'package:widget_icon/utils/StringConstants.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class EditIconScreen extends StatefulWidget {
   const EditIconScreen({Key? key}) : super(key: key);
@@ -39,12 +39,12 @@ class _EditIconScreenState extends State<EditIconScreen> {
     showDialog<bool>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-              title: const Text(Strings.ICON_DELETE_TITLE),
-              content: const Text(Strings.ICON_DELETE_MESSAGE),
+              title: Text('ICON_DELETE_TITLE'.tr()),
+              content: Text('ICON_DELETE_MESSAGE'.tr()),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text(Strings.ICON_DELETE_OK),
+                  child: Text('ICON_DELETE_OK'.tr()),
                 ),
               ],
             )).then((value) {});
@@ -65,7 +65,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(Strings.ICON_EDIT_TITLE),
+        title: Text('ICON_EDIT_TITLE'.tr()),
         backgroundColor: const Color(0xFFE6DFF1),
         elevation: 0,
         leading: IconButton(

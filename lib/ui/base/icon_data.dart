@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:widget_icon/utils/StringConstants.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class IconDataWidget extends StatefulWidget {
   final String? id;
@@ -89,7 +89,7 @@ class IconDataState extends State<IconDataWidget> {
                   borderSide: BorderSide(color: Colors.white),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                hintText: Strings.ICON_NAME_HINT,
+                hintText: 'ICON_NAME_HINT'.tr(),
                 errorBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.red),
                   borderRadius: BorderRadius.circular(10),
@@ -107,7 +107,7 @@ class IconDataState extends State<IconDataWidget> {
           ),
           Align(
               alignment: Alignment.centerLeft,
-              child: Text(Strings.ICON_CHOOSE_COLOR,
+              child: Text('ICON_CHOOSE_COLOR'.tr(),
                   style: const TextStyle(
                       color: Colors.black,
                       fontSize: 16,
@@ -120,7 +120,7 @@ class IconDataState extends State<IconDataWidget> {
           ),
           Align(
               alignment: Alignment.centerLeft,
-              child: Text(Strings.ICON_TYPE_WIDGET,
+              child: Text('ICON_TYPE_WIDGET'.tr(),
                   style: const TextStyle(
                       color: Colors.black,
                       fontSize: 16,
@@ -145,7 +145,7 @@ class IconDataState extends State<IconDataWidget> {
                   borderSide: BorderSide(color: Colors.white),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                hintText: Strings.ICON_NAME_HINT,
+                hintText: 'ICON_NAME_HINT'.tr(),
               ),
               style: const TextStyle(
                 color: Colors.black,
@@ -160,8 +160,8 @@ class IconDataState extends State<IconDataWidget> {
                 return new DropdownMenuItem<String>(
                   value: value,
                   child: new Text(value == "Image"
-                      ? Strings.ITEM_TYPE_IMAGE
-                      : Strings.ITEM_TYPE_LINK),
+                      ? 'ITEM_TYPE_IMAGE'.tr()
+                      : 'ITEM_TYPE_LINK'.tr()),
                 );
               }).toList(),
             ),
@@ -190,7 +190,7 @@ class IconDataState extends State<IconDataWidget> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10))),
           onPressed: () => {_chooseImage()},
-          child: Text(Strings.ICON_IMAGE_CHOOSE),
+          child: Text('ICON_IMAGE_CHOOSE'.tr()),
         ),
         if (_imageError != null)
           Align(
@@ -246,7 +246,7 @@ class IconDataState extends State<IconDataWidget> {
                 borderSide: BorderSide(color: Colors.red),
                 borderRadius: BorderRadius.circular(10),
               ),
-              hintText: Strings.ICON_URL_HINT,
+              hintText: 'ICON_URL_HINT'.tr(),
               errorText: _pathError),
           onChanged: (value) {
             setState(() {
@@ -334,14 +334,14 @@ class IconDataState extends State<IconDataWidget> {
     FocusScope.of(context).unfocus();
     if (_name.isEmpty) {
       setState(() {
-        _nameError = Strings.ICON_ERROR_ENTER_NAME;
+        _nameError = 'ICON_ERROR_ENTER_NAME'.tr();
       });
       return false;
     }
     if (_type == "Image") {
       if (_image == null || _image!.isEmpty) {
         setState(() {
-          _imageError = Strings.ICON_ERROR_CHOOSE_IMAGE;
+          _imageError = 'ICON_ERROR_CHOOSE_IMAGE'.tr();
         });
         return false;
       }
@@ -355,7 +355,7 @@ class IconDataState extends State<IconDataWidget> {
       return true;
     } else {
       if (_path == null || _path!.isEmpty) {
-        _pathError = Strings.ICON_ERROR_ENTER_URL;
+        _pathError = 'ICON_ERROR_ENTER_URL'.tr();
         return false;
       }
       var textColor = '#${_color.value.toRadixString(16)}';

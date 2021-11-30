@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,6 @@ import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:widget_icon/ui/editWidget/edit_icon.dart';
 import 'package:widget_icon/ui/newWidget/new_icon.dart';
-import 'package:widget_icon/utils/StringConstants.dart';
 import 'package:widget_icon/utils/Utils.dart';
 
 class WidgetsListScreen extends StatefulWidget {
@@ -112,7 +112,7 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text("Виджеты"),
+        title: Text("WIDGETS".tr()),
         backgroundColor: const Color(0xFFE6DFF1),
         elevation: 0,
       ),
@@ -176,7 +176,7 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
           children: [
             Align(
                 alignment: Alignment.centerLeft,
-                child: Text(Strings.EMPTY_TITLE,
+                child: Text('EMPTY_TITLE'.tr(),
                     textAlign: TextAlign.left,
                     style: const TextStyle(
                         color: Colors.black54,
@@ -184,7 +184,7 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
                         fontWeight: FontWeight.bold))),
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
-              child: Text(Strings.EMPTY_MESSAGE,
+              child: Text('EMPTY_MESSAGE'.tr(),
                   textAlign: TextAlign.left,
                   style: const TextStyle(color: Colors.black54, fontSize: 18)),
             ),
@@ -207,9 +207,9 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
     var name = _widgets["name_$id"]!;
     var path = _widgets["path_$id"]!;
     var type = int.parse(_widgets["type_$id"]!);
-    var typeText = Strings.ITEM_TYPE_IMAGE;
+    var typeText = 'ITEM_TYPE_IMAGE'.tr();
     if (type == 1) {
-      typeText = Strings.ITEM_TYPE_LINK;
+      typeText = 'ITEM_TYPE_LINK'.tr();
     }
     return GestureDetector(
       onTap: () => _editItem(id),
@@ -239,7 +239,7 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
                         height: 12,
                       ),
                       Text(
-                        "${Strings.ITEM_TYPE}: $typeText",
+                        'ITEM_TYPE'.tr(args: [typeText]),
                         style: TextStyle(
                             fontSize: 12, fontWeight: FontWeight.w500),
                       ),
@@ -270,7 +270,7 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
 
   Widget initFloatingActionButton() {
     return FloatingActionButton.extended(
-      label: const Text(Strings.LIST_ADD_WIDGET),
+      label: Text('LIST_ADD_WIDGET'.tr()),
       icon: const Icon(Icons.add),
       backgroundColor: Color(0xff8B56DD),
       onPressed: () {
@@ -283,12 +283,12 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
     showDialog<bool>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-          title: const Text(Strings.LIST_HOW_ADD_WIDGET_TITLE),
-          content: const Text(Strings.EMPTY_MESSAGE),
+          title: Text('LIST_HOW_ADD_WIDGET_TITLE'.tr()),
+          content: Text("EMPTY_MESSAGE".tr()),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text(Strings.LIST_HOW_ADD_WIDGET_OK, style: TextStyle(fontSize: 20),),
+              child: Text('LIST_HOW_ADD_WIDGET_OK'.tr(), style: TextStyle(fontSize: 20),),
             ),
           ],
         )).then((value) {});

@@ -1,0 +1,49 @@
+{
+  "APP_NAME_FIRST":"HOME",
+  "APP_NAME_SECOND":"SHORTCUTS",
+  "WIDGETS":"Виджеты",
+  "ICON_ERROR_ENTER_NAME":"Введите имя",
+  "ICON_ERROR_CHOOSE_IMAGE":"Выберите изображение",
+  "ICON_ERROR_ENTER_URL":"Введите адрес ссылки",
+
+  "ICON_DELETE_TITLE":"Удаление",
+  "ICON_DELETE_MESSAGE":"Удалить виджет можно только вручную с рабочего стола. Найдите виджет на рабочем столе и удалите его вручную.",
+  "ICON_DELETE_OK":"Хорошо",
+
+  "ICON_EDIT_TITLE":"Редактирование",
+
+  "ICON_NAME_HINT":"Имя виджета",
+
+  "ICON_COLOR_TITLE":"Цвет надписи в виджете",
+
+  "ICON_IMAGE_CHOOSE":"Выберите изображение",
+
+  "ICON_URL_HINT":"URL адрес",
+
+  "ICON_IMAGE_CHOOSE_TITLE":"Выберите цвет",
+
+  "ICON_IMAGE_CHOOSE_SELECT":"Выбрать",
+
+  "ICON_NEW_TITLE":"Новый виджет",
+
+  "EMPTY_TITLE":"Как добавить виджет",
+  "EMPTY_MESSAGE":"1. Коснитесь свободного участка на главном экране и удерживайте его или сведите два пальца.\n\n2. Коснитесь значка \"Виджеты\".\n\n3. Найдите наше приложение \"Home shortcuts\", нажмите на виджет и удерживайте его. Появятся изображения главных экранов.\n\n4. Перетащите виджет в нужное место и отпустите.",
+  "EMPTY_MESSAGE_ADD_WIDGET":"5. Или нажмите кнопку \"Добавить виджет\" ниже.",
+
+  "ITEM_TYPE":"Тип: {}",
+  "ITEM_TYPE_IMAGE":"Изображение",
+  "ITEM_TYPE_LINK":"Ссылка",
+
+  "ICON_CHOOSE_COLOR":"Цвет текста",
+  "ICON_TYPE_WIDGET":"Тип виджета",
+
+  "ONBOARDING_FIRST_TITLE":"Сделай скриншот\nили сохрани\nизображение в\nГалерею",
+  "ONBOARDING_SECOND_TITLE":"Добавь наш виджет\nна рабочий экран\nи\nвыбери нужное\nизображение",
+  "ONBOARDING_THIRD_TITLE":"ПОЗДРАВЛЯЮ!\n\nВыбранное\nизображение доступно\nв любое время\nбез интернета и долгих\nзагрузок",
+  "ONBOARDING_NEXT":"Продолжить",
+  "ONBOARDING_CLOSE":"ЗАКОНЧИТЬ",
+
+  "LIST_ADD_WIDGET":"ДОБАВИТЬ ВИДЖЕТ",
+  "LIST_HOW_ADD_WIDGET_TITLE":"Как добавить виджет",
+  "LIST_HOW_ADD_WIDGET_OK":"Хорошо"
+}
