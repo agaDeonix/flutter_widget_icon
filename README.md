@@ -1,6 +1,6 @@
-# widget_icon
+# Home Shortcuts
 
-Create widget like a icon for images
+Use Home Screen Widget like a windows shortcuts for images
 
 ## Getting Started
 
