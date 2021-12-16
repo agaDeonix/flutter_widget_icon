@@ -1,9 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:widget_icon/ui/base/icon_data.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class EditIconScreen extends StatefulWidget {
   const EditIconScreen({Key? key}) : super(key: key);
@@ -21,19 +20,8 @@ class EditIconArguments {
 
 class _EditIconScreenState extends State<EditIconScreen> {
   bool _isConfig = false;
-  bool _isDataRead = false;
-  SharedPreferences? _prefs;
 
   final GlobalKey<IconDataState> _dataWidgetState = GlobalKey<IconDataState>();
-
-  @override
-  void initState() {
-    super.initState();
-    () async {
-      _prefs = await SharedPreferences.getInstance();
-      setState(() {});
-    }();
-  }
 
   void _onRemoveClicked(String id) {
     showDialog<bool>(
@@ -56,10 +44,6 @@ class _EditIconScreenState extends State<EditIconScreen> {
         ModalRoute.of(context)!.settings.arguments as EditIconArguments;
     _isConfig = args.isConfig;
     var id = args.widgetId ?? "";
-    if (_prefs != null && !_isDataRead) {
-      _isDataRead = true;
-      setState(() {});
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -106,26 +90,7 @@ class _EditIconScreenState extends State<EditIconScreen> {
           ),
         ],
       ),
-      body: _prefs == null
-          ? _initLoading()
-          : IconDataWidget(key: _dataWidgetState, id: id, prefs: _prefs),
-    );
-  }
-
-  Widget _initLoading() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        SizedBox(
-          width: 50,
-          height: 50,
-          child: CircularProgressIndicator(
-            strokeWidth: 5,
-            backgroundColor: Colors.white,
-            valueColor: new AlwaysStoppedAnimation<Color>(Colors.blue),
-          ),
-        ),
-      ],
+      body: IconDataWidget(key: _dataWidgetState, id: id),
     );
   }
 }

@@ -1,11 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:receive_intent/receive_intent.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:widget_icon/ui/base/icon_data.dart';
-
-import 'package:easy_localization/easy_localization.dart';
+import 'package:widget_icon/utils/platform_home_manager.dart';
 
 class NewIconScreen extends StatefulWidget {
   const NewIconScreen({Key? key}) : super(key: key);
@@ -24,30 +22,16 @@ class NewIconArguments {
 class _NewIconScreenState extends State<NewIconScreen> {
   bool _isConfig = false;
   String? _widgetId;
-  bool _isDataRead = false;
-  SharedPreferences? _prefs;
 
   final GlobalKey<IconDataState> _dataWidgetState = GlobalKey<IconDataState>();
-
-  @override
-  void initState() {
-    super.initState();
-    () async {
-      _prefs = await SharedPreferences.getInstance();
-      setState(() {});
-    }();
-  }
 
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as NewIconArguments;
     _isConfig = args.isConfig;
     _widgetId = args.widgetId;
-    if (_prefs != null && !_isDataRead) {
-      _isDataRead = true;
-      setState(() {});
-    }
-    ReceiveIntent.setResult(kActivityResultCanceled);
+
+    PlatformHomeManager.instance.sendResultCanceled();
     return Scaffold(
       appBar: AppBar(
         title: Text('ICON_NEW_TITLE'.tr()),
@@ -84,26 +68,7 @@ class _NewIconScreenState extends State<NewIconScreen> {
           ),
         ],
       ),
-      body: _prefs == null
-          ? _initLoading()
-          : IconDataWidget(key: _dataWidgetState, id: _widgetId, prefs: _prefs),
-    );
-  }
-
-  Widget _initLoading() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        SizedBox(
-          width: 50,
-          height: 50,
-          child: CircularProgressIndicator(
-            strokeWidth: 5,
-            backgroundColor: Colors.white,
-            valueColor: new AlwaysStoppedAnimation<Color>(Colors.blue),
-          ),
-        ),
-      ],
+      body: IconDataWidget(key: _dataWidgetState, id: _widgetId),
     );
   }
 

@@ -5,11 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:home_widget/home_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:widget_icon/ui/editWidget/edit_icon.dart';
-import 'package:widget_icon/ui/newWidget/new_icon.dart';
-import 'package:widget_icon/utils/Utils.dart';
+import 'package:widget_icon/utils/platform_home_manager.dart';
+import 'package:widget_icon/utils/utils.dart';
 
 class WidgetsListScreen extends StatefulWidget {
   @override
@@ -41,42 +39,24 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
 }
 
 class _WidgetsListScreenState extends State<WidgetsListScreen> {
-  List<String> _ids = [];
-  Map<String, String> _widgets = {};
-  SharedPreferences? _prefs;
-
-  static const platform = MethodChannel('samples.flutter.dev/widgets');
-
   @override
   void initState() {
     super.initState();
-    () async {
-      _prefs = await SharedPreferences.getInstance();
-      setState(() {});
-    }();
     SystemChannels.lifecycle.setMessageHandler((msg) async {
-      debugPrint('SystemChannels> $msg');
-      if (msg == AppLifecycleState.resumed.toString() && _prefs != null) {
-        _prefs!.reload().then((value) {
-          setState(() {});
-        });
+      if (msg == AppLifecycleState.resumed.toString()) {
+        setState(() {});
       }
-      ;
     });
-    HomeWidget.updateWidget(
-      name: 'SimpleAppWidget',
-      androidName: 'SimpleAppWidget',
-      iOSName: 'SimpleAppWidget',
-    );
+    PlatformHomeManager.instance.updateHomeWidgets();
   }
 
-  void _addNew() {
-    Navigator.pushNamed(context, '/add_new',
-            arguments: NewIconArguments(null, false))
-        .then((value) {
-      setState(() {});
-    });
-  }
+  // void _addNew() {
+  //   Navigator.pushNamed(context, '/add_new',
+  //           arguments: NewIconArguments(null, false))
+  //       .then((value) {
+  //     setState(() {});
+  //   });
+  // }
 
   void _editItem(String id) {
     Navigator.pushNamed(context, '/edit',
@@ -88,64 +68,43 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_prefs != null) {
-      _ids = _prefs!
-              .getString("list_ids")
-              ?.split(",")
-              .where((element) => element.isNotEmpty)
-              .toList() ??
-          List.empty();
-      for (var id in _ids) {
-        _widgets["name_$id"] = _prefs!.getString("name_$id") ?? "";
-        _widgets["path_$id"] = _prefs!.getString("path_$id") ?? "";
-        _widgets["type_$id"] = (_prefs!.getString("type_$id") ?? "0");
-      }
-    }
-
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text("WIDGETS".tr()),
-        backgroundColor: const Color(0xFFE6DFF1),
-        elevation: 0,
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: _prefs == null
-            ? _initLoading()
-            : (_ids.isEmpty ? _initEmpty() : _initList()),
-      ),
-      floatingActionButton:
-          _prefs != null && _ids.isNotEmpty
-              ? initFloatingActionButton()
-              : null,
-    );
+        appBar: AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text("WIDGETS".tr()),
+          backgroundColor: const Color(0xFFE6DFF1),
+          elevation: 0,
+        ),
+        body: Center(
+            // Center is a layout widget. It takes a single child and positions it
+            // in the middle of the parent.
+            child: FutureBuilder<List<HomeWidgetData>>(
+          future: PlatformHomeManager.instance.getHomeWidgetsLists(),
+          builder: (context, AsyncSnapshot<List<HomeWidgetData>> snapshot) {
+            if (snapshot.hasData) {
+              return (snapshot.data!.isEmpty
+                  ? _initEmpty()
+                  : _initList(snapshot.data!));
+            } else {
+              return _initLoading();
+            }
+          },
+        )),
+        floatingActionButton: FutureBuilder<List<HomeWidgetData>>(
+          future: PlatformHomeManager.instance.getHomeWidgetsLists(),
+          builder: (context, AsyncSnapshot<List<HomeWidgetData>> snapshot) {
+            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              return initFloatingActionButton();
+            } else {
+              return SizedBox();
+            }
+          },
+        ));
   }
 
   Widget _initLoading() {
     return Column(
-      // Column is also a layout widget. It takes a list of children and
-      // arranges them vertically. By default, it sizes itself to fit its
-      // children horizontally, and tries to be as tall as its parent.
-      //
-      // Invoke "debug painting" (press "p" in the console, choose the
-      // "Toggle Debug Paint" action from the Flutter Inspector in Android
-      // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-      // to see the wireframe for each widget.
-      //
-      // Column has various properties to control how it sizes itself and
-      // how it positions its children. Here we use mainAxisAlignment to
-      // center the children vertically; the main axis here is the vertical
-      // axis because Columns are vertical (the cross axis would be
-      // horizontal).
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         SizedBox(
@@ -194,19 +153,20 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
     );
   }
 
-  Widget _initList() {
+  Widget _initList(List<HomeWidgetData> list) {
     return ListView.builder(
-      itemCount: _ids.length,
+      itemCount: list.length,
       itemBuilder: (context, index) {
-        return _initItem(_ids[index], index == 0, index == _ids.length - 1);
+        return _initItem(list[index], index == 0, index == list.length - 1);
       },
     );
   }
 
-  Widget _initItem(String id, bool isFirst, bool isLast) {
-    var name = _widgets["name_$id"]!;
-    var path = _widgets["path_$id"]!;
-    var type = int.parse(_widgets["type_$id"]!);
+  Widget _initItem(HomeWidgetData homeWidgetData, bool isFirst, bool isLast) {
+    var id = homeWidgetData.id;
+    var name = homeWidgetData.name;
+    var path = homeWidgetData.path;
+    var type = int.parse(homeWidgetData.type);
     var typeText = 'ITEM_TYPE_IMAGE'.tr();
     if (type == 1) {
       typeText = 'ITEM_TYPE_LINK'.tr();
@@ -283,14 +243,17 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
     showDialog<bool>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-          title: Text('LIST_HOW_ADD_WIDGET_TITLE'.tr()),
-          content: Text("EMPTY_MESSAGE".tr()),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text('LIST_HOW_ADD_WIDGET_OK'.tr(), style: TextStyle(fontSize: 20),),
-            ),
-          ],
-        )).then((value) {});
+              title: Text('LIST_HOW_ADD_WIDGET_TITLE'.tr()),
+              content: Text("EMPTY_MESSAGE".tr()),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(
+                    'LIST_HOW_ADD_WIDGET_OK'.tr(),
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
+              ],
+            )).then((value) {});
   }
 }

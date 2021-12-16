@@ -1,18 +1,16 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:widget_icon/utils/platform_home_manager.dart';
 
 class IconDataWidget extends StatefulWidget {
   final String? id;
-  final SharedPreferences? prefs;
 
-  const IconDataWidget({Key? key, this.id, this.prefs}) : super(key: key);
+  const IconDataWidget({Key? key, this.id}) : super(key: key);
 
   @override
   IconDataState createState() => IconDataState();
@@ -28,39 +26,23 @@ class IconDataState extends State<IconDataWidget> {
     Colors.lightGreen
   ];
 
-  String _id = "";
-  String _name = "";
+  late HomeWidgetData _homeWidgetData;
   String? _nameError;
-  String? _path;
   String? _pathError;
-  String? _image;
   String? _imageError;
-  String _type = "Image";
   late Color _color;
   var _nameController = TextEditingController(text: '');
   var _linkController = TextEditingController(text: '');
   final ImagePicker _picker = ImagePicker();
-  late SharedPreferences _prefs;
-
-  static const platform = MethodChannel('samples.flutter.dev/widgets');
 
   @override
   void initState() {
     super.initState();
-    _id = widget.id ?? "";
-    _prefs = widget.prefs!;
-    _name = _prefs.getString("name_$_id") ?? "";
-    _type = (int.parse(_prefs.getString("type_$_id") ?? "0")) == 0
-        ? "Image"
-        : "Link";
-    if (_type == "Image") {
-      _image = _prefs.getString("path_$_id") ?? "";
-    } else {
-      _path = _prefs.getString("path_$_id") ?? "";
-    }
-    _color = fromHex(_prefs.getString("text_color_$_id")) ?? colors.first;
-    _nameController = TextEditingController(text: _name);
-    _linkController = TextEditingController(text: _path);
+    _homeWidgetData =
+        PlatformHomeManager.instance.getHomeWidget(widget.id ?? "");
+    _color = fromHex(_homeWidgetData.color) ?? colors.first;
+    _nameController = TextEditingController(text: _homeWidgetData.name);
+    _linkController = TextEditingController(text: _homeWidgetData.path);
   }
 
   @override
@@ -97,7 +79,7 @@ class IconDataState extends State<IconDataWidget> {
                 errorText: _nameError),
             onChanged: (value) {
               setState(() {
-                _name = value;
+                _homeWidgetData.name = value;
                 _nameError = null;
               });
             },
@@ -129,7 +111,7 @@ class IconDataState extends State<IconDataWidget> {
             padding: const EdgeInsets.only(top: 10.0, bottom: 15),
             child: new DropdownButtonFormField(
               isExpanded: true,
-              value: _type,
+              value: _homeWidgetData.type,
               elevation: 10,
               iconEnabledColor: Color(0xff8B56DD),
               decoration: InputDecoration(
@@ -153,7 +135,7 @@ class IconDataState extends State<IconDataWidget> {
               ),
               onChanged: (String? newValue) {
                 setState(() {
-                  _type = newValue!;
+                  _homeWidgetData.type = newValue!;
                 });
               },
               items: <String>['Image', 'Link'].map((String value) {
@@ -173,7 +155,7 @@ class IconDataState extends State<IconDataWidget> {
   }
 
   Widget initLayoutByType() {
-    if (_type == "Image") {
+    if (_homeWidgetData.type == "Image") {
       return initPhoto();
     } else {
       return initLink();
@@ -203,14 +185,14 @@ class IconDataState extends State<IconDataWidget> {
               ),
             ),
           ),
-        if (_image != null && _image!.isNotEmpty)
+        if (_homeWidgetData.path.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 15.0),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: new LayoutBuilder(builder: (context, constraint) {
                 return Image.file(
-                  File(_image!),
+                  File(_homeWidgetData.path),
                   width: constraint.biggest.width,
                 );
               }),
@@ -250,7 +232,7 @@ class IconDataState extends State<IconDataWidget> {
               errorText: _pathError),
           onChanged: (value) {
             setState(() {
-              _path = value;
+              _homeWidgetData.path = value;
               _pathError = null;
             });
           },
@@ -260,7 +242,10 @@ class IconDataState extends State<IconDataWidget> {
   }
 
   void changeColor(Color color) {
-    setState(() => _color = color);
+    _homeWidgetData.color = '#${color.value.toRadixString(16)}';
+    setState(() {
+      _color = color;
+    });
   }
 
   List<Widget> _initColors() {
@@ -268,6 +253,7 @@ class IconDataState extends State<IconDataWidget> {
     colors.forEach((element) {
       result.add(GestureDetector(
         onTap: () {
+          _homeWidgetData.color = '#${element.value.toRadixString(16)}';
           setState(() {
             _color = element;
           });
@@ -314,13 +300,13 @@ class IconDataState extends State<IconDataWidget> {
   Future<void> _chooseImage() async {
     var image = await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
-      _image = image!.path;
+      _homeWidgetData.path = image!.path;
       _imageError = null;
     });
   }
 
   Color? fromHex(String? hexString) {
-    if (hexString != null) {
+    if (hexString != null && hexString.isNotEmpty) {
       final buffer = StringBuffer();
       if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
       buffer.write(hexString.replaceFirst('#', ''));
@@ -332,63 +318,33 @@ class IconDataState extends State<IconDataWidget> {
 
   Future<bool> saveData() async {
     FocusScope.of(context).unfocus();
-    if (_name.isEmpty) {
+    if (_homeWidgetData.name.isEmpty) {
       setState(() {
         _nameError = 'ICON_ERROR_ENTER_NAME'.tr();
       });
       return false;
     }
-    if (_type == "Image") {
-      if (_image == null || _image!.isEmpty) {
-        setState(() {
+
+    if (_homeWidgetData.path.isEmpty) {
+      setState(() {
+        if (_homeWidgetData.type == "Image") {
           _imageError = 'ICON_ERROR_CHOOSE_IMAGE'.tr();
-        });
-        return false;
-      }
-      var textColor = '#${_color.value.toRadixString(16)}';
-      await saveWidgetData(_id, _name, textColor, 0, _image!);
-      HomeWidget.updateWidget(
-          name: 'SimpleAppWidget',
-          androidName: 'SimpleAppWidget',
-          iOSName: 'SimpleAppWidget');
-      await _setActivityResult();
-      return true;
-    } else {
-      if (_path == null || _path!.isEmpty) {
-        _pathError = 'ICON_ERROR_ENTER_URL'.tr();
-        return false;
-      }
-      var textColor = '#${_color.value.toRadixString(16)}';
-      await saveWidgetData(_id, _name, textColor, 1, _path!);
-      HomeWidget.updateWidget(
-          name: 'SimpleAppWidget',
-          androidName: 'SimpleAppWidget',
-          iOSName: 'SimpleAppWidget');
-      await _setActivityResult();
-      return true;
+        } else {
+          _pathError = 'ICON_ERROR_ENTER_URL'.tr();
+        }
+      });
     }
+    await saveWidgetData();
+    PlatformHomeManager.instance.updateHomeWidgets();
+    await _setActivityResult();
+    return true;
   }
 
-  Future<void> saveWidgetData(String widgetId, String name, String textColor,
-      int type, String path) async {
-    var list = _prefs.getString("list_ids");
-    if (list == null || list.isEmpty) {
-      list = widgetId;
-    } else {
-      if (!list.contains(widgetId)) {
-        list += ",${widgetId}";
-      }
-    }
-    _prefs.setString("list_ids", list);
-    return _prefs
-        .setBool("deleted_$widgetId", false)
-        .then((value) => _prefs.setString("name_${widgetId}", name))
-        .then((value) => _prefs.setString("text_color_${widgetId}", textColor))
-        .then((value) => _prefs.setString("type_${widgetId}", type.toString()))
-        .then((value) => _prefs.setString("path_${widgetId}", path));
+  Future<void> saveWidgetData() {
+    return PlatformHomeManager.instance.saveHomeWidget(_homeWidgetData);
   }
 
-  Future<void> _setActivityResult() async {
-    await platform.invokeMethod('setConfigResult', {"id": _id});
+  Future<void> _setActivityResult() {
+    return PlatformHomeManager.instance.setConfigResult(_homeWidgetData.id);
   }
 }
