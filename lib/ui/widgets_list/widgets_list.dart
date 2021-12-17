@@ -72,7 +72,7 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: Text("WIDGETS".tr()),
+          title: Text("WIDGETS".tr(), style: TextStyle(color: Colors.black),),
           backgroundColor: const Color(0xFFE6DFF1),
           elevation: 0,
         ),
