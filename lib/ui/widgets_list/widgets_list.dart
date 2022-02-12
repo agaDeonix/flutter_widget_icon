@@ -9,6 +9,8 @@ import 'package:widget_icon/ui/editWidget/edit_icon.dart';
 import 'package:widget_icon/utils/platform_home_manager.dart';
 import 'package:widget_icon/utils/utils.dart';
 
+import '../colors.style.dart';
+
 class WidgetsListScreen extends StatefulWidget {
   @override
   _WidgetsListScreenState createState() => _WidgetsListScreenState();
@@ -73,7 +75,7 @@ class _WidgetsListScreenState extends State<WidgetsListScreen> {
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
           title: Text("WIDGETS".tr()),
-          backgroundColor: const Color(0xFFE6DFF1),
+          backgroundColor: CColors.background,
           elevation: 0,
         ),
         body: Center(

@@ -1,40 +1,48 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:widget_icon/utils/Constants.dart';
+import 'package:pmvvm/mvvm_builder.widget.dart';
+import 'package:pmvvm/pmvvm.dart';
+import 'package:widget_icon/ui/colors.style.dart';
+import 'package:widget_icon/ui/onboarding/onboarding.vm.dart';
 
-import 'package:easy_localization/easy_localization.dart';
-
-class OnboardingScreen extends StatefulWidget {
-  @override
-  _OnboardingScreenState createState() => _OnboardingScreenState();
-}
-
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  var _currentPage = 0;
+class OnboardingScreen extends StatelessWidget {
+  const OnboardingScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    return MVVM<OnboardingViewModel>(
+      view: (context, vmodel) => _OnboardinggView(),
+      viewModel: OnboardingViewModel(),
+    );
+  }
+}
+
+class _OnboardinggView extends StatelessView<OnboardingViewModel> {
+  const _OnboardinggView({Key? key}) : super(key: key, reactive: true);
+
+  @override
+  Widget render(BuildContext context, OnboardingViewModel viewModel) {
     return Scaffold(
         body: Container(
-      color: Color.fromARGB(255, 230, 223, 241),
-      child: getPages(),
+      color: CColors.background,
+      child: getPages(viewModel),
     ));
   }
 
-  Widget getPages() {
-    switch (_currentPage) {
+  Widget getPages(OnboardingViewModel viewModel) {
+    switch (viewModel.currentPage) {
       case 0:
         {
-          return getFirstPage();
+          return getFirstPage(viewModel);
         }
       case 1:
         {
-          return getSecondPage();
+          return getSecondPage(viewModel);
         }
       case 2:
         {
-          return getThirdPage();
+          return getThirdPage(viewModel);
         }
       default:
         {
@@ -43,7 +51,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
-  Widget getFirstPage() {
+  Widget getFirstPage(OnboardingViewModel viewModel) {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
@@ -82,11 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       textStyle: const TextStyle(fontSize: 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10))),
-                  onPressed: () {
-                    setState(() {
-                      _currentPage++;
-                    });
-                  },
+                  onPressed: viewModel.nextPage,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
@@ -103,7 +107,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget getSecondPage() {
+  Widget getSecondPage(OnboardingViewModel viewModel) {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
@@ -142,11 +146,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       textStyle: const TextStyle(fontSize: 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10))),
-                  onPressed: () {
-                    setState(() {
-                      _currentPage++;
-                    });
-                  },
+                  onPressed: viewModel.nextPage,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text('ONBOARDING_NEXT'.tr().toUpperCase(),
@@ -161,7 +161,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget getThirdPage() {
+  Widget getThirdPage(OnboardingViewModel viewModel) {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
@@ -200,15 +200,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         textStyle: const TextStyle(fontSize: 16),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10))),
-                    onPressed: () {
-                      () async {
-                        var prefs = await SharedPreferences.getInstance();
-                        setState(() {
-                          prefs.setBool(Constants.IS_ONBOARDING_SHOWN, true);
-                          Navigator.pushReplacementNamed(context, "/list");
-                        });
-                      }();
-                    },
+                    onPressed: viewModel.nextPage,
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Text('ONBOARDING_CLOSE'.tr().toUpperCase(),
